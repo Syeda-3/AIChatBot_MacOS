@@ -13,7 +13,8 @@ class APIHandler {
     private init() {}
     
     private let baseURL = "https://api.openai.com/v1/chat/completions"
-    let apiKey = ProcessInfo.processInfo.environment["API_KEY"] ?? ""
+    
+    let apiKey = Bundle.main.infoDictionary?["API_KEY"] ?? ""
 
     func callFeatureAPI(feature: CoreAIFeature, input: String, completion: @escaping (Result<String, Error>) -> Void) {
         let systemPrompt: String
@@ -37,9 +38,10 @@ class APIHandler {
                 systemPrompt = "Understand and extract insights from long documents."
             }
                 
-        
+        let model = ModelManager.shared.selectedModelAPIName
+
         let params: [String: Any] = [
-            "model": "gpt-4o",   // or gpt-4
+            "model": model,   // or gpt-4
             "messages": [
                 ["role": "system", "content": systemPrompt],
                 ["role": "user", "content": input]

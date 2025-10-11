@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A61569002E9A92E30022E09E /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A61568FF2E9A92E30022E09E /* Secrets.xcconfig */; };
+		A6243A562E9AAB75009AA0C2 /* ModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6243A552E9AAB6E009AA0C2 /* ModelView.swift */; };
 		A67C4FD82E90000200100FB6 /* FontsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FC82E90000200100FB6 /* FontsManager.swift */; };
 		A67C4FD92E90000200100FB6 /* ConversationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCA2E90000200100FB6 /* ConversationManager.swift */; };
 		A67C4FDA2E90000200100FB6 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCB2E90000200100FB6 /* Model.xcdatamodeld */; };
@@ -32,6 +33,7 @@
 
 /* Begin PBXFileReference section */
 		A61568FF2E9A92E30022E09E /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		A6243A552E9AAB6E009AA0C2 /* ModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelView.swift; sourceTree = "<group>"; };
 		A67C4F8D2E8FFF1F00100FB6 /* AiChatBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AiChatBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A67C4FC12E90000200100FB6 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
 		A67C4FC22E90000200100FB6 /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
@@ -95,28 +97,22 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
-		A67C4FC92E90000200100FB6 /* Helpers */ = {
+		A67C4FC92E90000200100FB6 /* Helper Managers */ = {
 			isa = PBXGroup;
 			children = (
-				A67C4FC82E90000200100FB6 /* FontsManager.swift */,
-			);
-			path = Helpers;
-			sourceTree = "<group>";
-		};
-		A67C4FCD2E90000200100FB6 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				A6AE5BCA2E905D55005DEBA5 /* FeatureManager.swift */,
 				A67C4FD32E90000200100FB6 /* AudioWaveManager.swift */,
 				A67C4FCA2E90000200100FB6 /* ConversationManager.swift */,
+				A67C4FC82E90000200100FB6 /* FontsManager.swift */,
 				A67C4FCC2E90000200100FB6 /* PersistenceController.swift */,
+				A6AE5BCA2E905D55005DEBA5 /* FeatureManager.swift */,
 			);
-			path = Model;
+			path = "Helper Managers";
 			sourceTree = "<group>";
 		};
 		A67C4FD02E90000200100FB6 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A6243A552E9AAB6E009AA0C2 /* ModelView.swift */,
 				A6A8912E2E90455200A6725A /* CoreAiView.swift */,
 				A6A8912A2E90437F00A6725A /* MainContainer.swift */,
 				A67C4FCE2E90000200100FB6 /* ChatWithAIView.swift */,
@@ -132,8 +128,7 @@
 				A6AE5BC92E9055BF005DEBA5 /* Info.plist */,
 				A67C4FCB2E90000200100FB6 /* Model.xcdatamodeld */,
 				A67C4FC62E90000200100FB6 /* Fonts */,
-				A67C4FC92E90000200100FB6 /* Helpers */,
-				A67C4FCD2E90000200100FB6 /* Model */,
+				A67C4FC92E90000200100FB6 /* Helper Managers */,
 				A67C4FD02E90000200100FB6 /* Views */,
 				A67C4FD12E90000200100FB6 /* AiChatBotApp.swift */,
 				A67C4FD22E90000200100FB6 /* Assets.xcassets */,
@@ -245,6 +240,7 @@
 				A67C4FDD2E90000200100FB6 /* SideMenuView.swift in Sources */,
 				A6A8912B2E9043A200A6725A /* MainContainer.swift in Sources */,
 				A67C4FDE2E90000200100FB6 /* AiChatBotApp.swift in Sources */,
+				A6243A562E9AAB75009AA0C2 /* ModelView.swift in Sources */,
 				A67C4FDF2E90000200100FB6 /* AudioWaveManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

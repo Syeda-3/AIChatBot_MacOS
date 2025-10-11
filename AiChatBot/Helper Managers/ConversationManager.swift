@@ -11,6 +11,7 @@ import SwiftUI
 import Combine
 import Alamofire
 
+
 class ConversationManager: ObservableObject {
     private let viewContext: NSManagedObjectContext
     
@@ -18,8 +19,8 @@ class ConversationManager: ObservableObject {
     @Published var activeConversation: Conversation?
     private var currentRequest: DataRequest?
     
-    let apiKey = ProcessInfo.processInfo.environment["API_KEY"] ?? ""
-
+    let apiKey = Bundle.main.infoDictionary?["API_KEY"] ?? ""
+    
     private let baseURL = "https://api.openai.com/v1"
     
     init(context: NSManagedObjectContext) {
@@ -98,13 +99,15 @@ class ConversationManager: ObservableObject {
     }
     
     // MARK: - Send to OpenAI (Chat)
-    func sendToOpenAI(text: String, model: String, completion: (() -> Void)? = nil) {
+    func sendToOpenAI(text: String, completion: (() -> Void)? = nil) {
         guard let convo = activeConversation else {
             print("⚠️ No active conversation.")
             completion?()
             return
         }
         
+        let model = ModelManager.shared.selectedModelAPIName
+
         addMessage(to: convo, text: text, isUser: true)
         
         let url = "\(baseURL)/chat/completions"
@@ -160,7 +163,7 @@ class ConversationManager: ObservableObject {
     // MARK: - Audio Upload (Transcription)
     func sendAudio(fileURL: URL, completion: @escaping (String?) -> Void) {
         let endpoint = "\(baseURL)/audio/transcriptions"
-        
+
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(apiKey)"
         ]
@@ -183,6 +186,7 @@ class ConversationManager: ObservableObject {
     // MARK: - Image Generation
     func generateImage(prompt: String, completion: @escaping (String?) -> Void) {
         let url = "\(baseURL)/images/generations"
+
         let json: [String: Any] = ["model": "gpt-image-1", "prompt": prompt]
         
         let headers: HTTPHeaders = [

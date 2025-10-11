@@ -120,117 +120,121 @@ struct ChatWithAIView: View {
                     .cornerRadius(12)
                     .padding(.vertical, 8)
                     
-                    
-                    // Messages area
                     VStack {
-                        ScrollViewReader { proxy in
-                            ScrollView {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    ForEach(convoManager.activeConversation?.messagesArray ?? [], id: \.id) { msg in
+                        HStack {
+                            Spacer()
+                            ModelSelectorView()
+                                .frame(width: 200)
+                                .padding(.trailing, 16)
+                                .padding(.vertical,8)
+                        }
+                        
+                        // Messages area
+                        VStack {
+                            ScrollViewReader { proxy in
+                                ScrollView {
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        ForEach(convoManager.activeConversation?.messagesArray ?? [], id: \.id) { msg in
+                                            HStack {
+                                                if msg.isUser {
+                                                    Spacer()
+                                                    Text(msg.text ?? "")
+                                                        .padding()
+                                                        .foregroundColor(.white)
+                                                        .cornerRadius(12)
+                                                } else {
+                                                    Text(msg.text ?? "")
+                                                        .padding()
+                                                        .background(Color.black)
+                                                        .foregroundColor(.white)
+                                                        .cornerRadius(12)
+                                                    Spacer()
+                                                }
+                                            }
+                                            .id(msg.id) // important for scrolling
+                                        }
+                                    }
+                                    .padding()
+                                }
+                                .onChange(of: convoManager.activeConversation?.messagesArray.count) { _ in
+                                    if let lastId = convoManager.activeConversation?.messagesArray.last?.id {
+                                        withAnimation {
+                                            proxy.scrollTo(lastId, anchor: .bottom)
+                                        }
+                                    }
+                                }
+                                .onAppear {
+                                    if let lastId = convoManager.activeConversation?.messagesArray.last?.id {
+                                        DispatchQueue.main.async {
+                                            proxy.scrollTo(lastId, anchor: .bottom)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            Divider()
+                            
+                            // Buttons row
+                            HStack(spacing: 12) {
+                                if isGenerating {
+                                    Button(action: {
+                                        convoManager.cancelGeneration()
+                                        isGenerating = false
+                                    }) {
                                         HStack {
-                                            if msg.isUser {
-                                                Spacer()
-                                                Text(msg.text ?? "")
-                                                    .padding()
-                                                    .foregroundColor(.white)
-                                                    .cornerRadius(12)
-                                            } else {
-                                                Text(msg.text ?? "")
-                                                    .padding()
-                                                    .background(Color.black)
-                                                    .foregroundColor(.white)
-                                                    .cornerRadius(12)
-                                                Spacer()
+                                            Image(systemName: "stop.circle")
+                                            Text("Stop Generating")
+                                        }
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .foregroundColor(.red)
+                                        .background(Color.black)
+                                        .cornerRadius(8)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                else if convoManager.activeConversation != nil {
+                                    Button(action: {
+                                        if let lastUserMsg = convoManager.activeConversation?.messagesArray.last(where: { $0.isUser })?.text {
+                                            isGenerating = true
+                                            convoManager.sendToOpenAI(text: lastUserMsg) {
+                                                isGenerating = false
                                             }
                                         }
-                                        .id(msg.id) // important for scrolling
-                                    }
-                                }
-                                .padding()
-                            }
-                            .onChange(of: convoManager.activeConversation?.messagesArray.count) { _ in
-                                if let lastId = convoManager.activeConversation?.messagesArray.last?.id {
-                                    withAnimation {
-                                        proxy.scrollTo(lastId, anchor: .bottom)
-                                    }
-                                }
-                            }
-                            .onAppear {
-                                if let lastId = convoManager.activeConversation?.messagesArray.last?.id {
-                                    DispatchQueue.main.async {
-                                        proxy.scrollTo(lastId, anchor: .bottom)
-                                    }
-                                }
-                            }
-                        }
-                        
-                        Divider()
-                        
-                        // Buttons row
-                        HStack(spacing: 12) {
-                            if isGenerating {
-                                Button(action: {
-                                    convoManager.cancelGeneration()
-                                    isGenerating = false
-                                }) {
-                                    HStack {
-                                        Image(systemName: "stop.circle")
-                                        Text("Stop Generating")
-                                    }
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .foregroundColor(.red)
-                                    .background(Color.black)
-                                    .cornerRadius(8)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            else if convoManager.activeConversation != nil {
-                                Button(action: {
-                                    if let lastUserMsg = convoManager.activeConversation?.messagesArray.last(where: { $0.isUser })?.text {
-                                        isGenerating = true
-                                        convoManager.sendToOpenAI(text: lastUserMsg, model: "gpt-4o") {
-                                            isGenerating = false
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "arrow.clockwise")
+                                            Text("Regenerate")
                                         }
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .foregroundColor(.green)
+                                        .background(Color.black)
+                                        .cornerRadius(8)
                                     }
-                                }) {
-                                    HStack {
-                                        Image(systemName: "arrow.clockwise")
-                                        Text("Regenerate")
-                                    }
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .foregroundColor(.green)
-                                    .background(Color.black)
-                                    .cornerRadius(8)
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
                             }
+                            .padding(.bottom, 4)
+                            
+                            // Message box
+                            messageBox
+                                .frame(height: editorHeight)
+                                .padding()
+                                .onChange(of: inputText) { _ in recalcHeight() }
                         }
-                        .padding(.bottom, 4)
-                        
-                        // Message box
-                        messageBox
-                            .frame(height: editorHeight)
-                            .padding()
-                            .onChange(of: inputText) { _ in recalcHeight() }
+//                        .padding()
+                        .background(Color("BgColor"))
+                        .cornerRadius(12)
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
                     }
-                    .padding()
-                    .background(Color("BgColor"))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
                 }
             }
         }
         .onAppear {
             if convoManager.activeConversation == nil {
                 convoManager.activeConversation = conversations.last
-            }
-            if let apiKey = Bundle.main.infoDictionary?["API_KEY"] as? String {
-                
-                print(apiKey)
-                print(">>>>>>")
             }
         }
     }
@@ -367,7 +371,7 @@ struct ChatWithAIView: View {
         }
         
         isGenerating = true
-        convoManager.sendToOpenAI(text: text, model: "gpt-4o") {
+        convoManager.sendToOpenAI(text: text) {
             isGenerating = false
         }
         
