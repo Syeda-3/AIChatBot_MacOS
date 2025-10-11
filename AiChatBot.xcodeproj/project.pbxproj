@@ -1,0 +1,537 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A61569002E9A92E30022E09E /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A61568FF2E9A92E30022E09E /* Secrets.xcconfig */; };
+		A67C4FD82E90000200100FB6 /* FontsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FC82E90000200100FB6 /* FontsManager.swift */; };
+		A67C4FD92E90000200100FB6 /* ConversationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCA2E90000200100FB6 /* ConversationManager.swift */; };
+		A67C4FDA2E90000200100FB6 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCB2E90000200100FB6 /* Model.xcdatamodeld */; };
+		A67C4FDB2E90000200100FB6 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCC2E90000200100FB6 /* PersistenceController.swift */; };
+		A67C4FDC2E90000200100FB6 /* ChatWithAIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCE2E90000200100FB6 /* ChatWithAIView.swift */; };
+		A67C4FDD2E90000200100FB6 /* SideMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCF2E90000200100FB6 /* SideMenuView.swift */; };
+		A67C4FDE2E90000200100FB6 /* AiChatBotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FD12E90000200100FB6 /* AiChatBotApp.swift */; };
+		A67C4FDF2E90000200100FB6 /* AudioWaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FD32E90000200100FB6 /* AudioWaveManager.swift */; };
+		A67C4FE12E90000200100FB6 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A67C4FC12E90000200100FB6 /* Inter-Bold.ttf */; };
+		A67C4FE22E90000200100FB6 /* Inter-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A67C4FC22E90000200100FB6 /* Inter-Light.ttf */; };
+		A67C4FE32E90000200100FB6 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A67C4FC32E90000200100FB6 /* Inter-Medium.ttf */; };
+		A67C4FE42E90000200100FB6 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A67C4FC42E90000200100FB6 /* Inter-Regular.ttf */; };
+		A67C4FE52E90000200100FB6 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A67C4FC52E90000200100FB6 /* Inter-SemiBold.ttf */; };
+		A67C4FE62E90000200100FB6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A67C4FD22E90000200100FB6 /* Assets.xcassets */; };
+		A67C4FE92E9001AB00100FB6 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = A67C4FE82E9001AB00100FB6 /* Alamofire */; };
+		A6A8912B2E9043A200A6725A /* MainContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6A8912A2E90437F00A6725A /* MainContainer.swift */; };
+		A6A8912F2E90456000A6725A /* CoreAiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6A8912E2E90455200A6725A /* CoreAiView.swift */; };
+		A6AE5BCB2E905D5D005DEBA5 /* FeatureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AE5BCA2E905D55005DEBA5 /* FeatureManager.swift */; };
+		A6AE5BCF2E906212005DEBA5 /* ConversationCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AE5BCD2E906212005DEBA5 /* ConversationCellView.swift */; };
+		A6AE5BD12E906273005DEBA5 /* FeatureCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AE5BD02E90626C005DEBA5 /* FeatureCellView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A61568FF2E9A92E30022E09E /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		A67C4F8D2E8FFF1F00100FB6 /* AiChatBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AiChatBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A67C4FC12E90000200100FB6 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
+		A67C4FC22E90000200100FB6 /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
+		A67C4FC32E90000200100FB6 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
+		A67C4FC42E90000200100FB6 /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
+		A67C4FC52E90000200100FB6 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		A67C4FC82E90000200100FB6 /* FontsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontsManager.swift; sourceTree = "<group>"; };
+		A67C4FCA2E90000200100FB6 /* ConversationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationManager.swift; sourceTree = "<group>"; };
+		A67C4FCC2E90000200100FB6 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		A67C4FCE2E90000200100FB6 /* ChatWithAIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatWithAIView.swift; sourceTree = "<group>"; };
+		A67C4FCF2E90000200100FB6 /* SideMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuView.swift; sourceTree = "<group>"; };
+		A67C4FD12E90000200100FB6 /* AiChatBotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AiChatBotApp.swift; sourceTree = "<group>"; };
+		A67C4FD22E90000200100FB6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A67C4FD32E90000200100FB6 /* AudioWaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveManager.swift; sourceTree = "<group>"; };
+		A67C4FD62E90000200100FB6 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		A6A8912A2E90437F00A6725A /* MainContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainer.swift; sourceTree = "<group>"; };
+		A6A8912E2E90455200A6725A /* CoreAiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAiView.swift; sourceTree = "<group>"; };
+		A6AE5BC92E9055BF005DEBA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A6AE5BCA2E905D55005DEBA5 /* FeatureManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureManager.swift; sourceTree = "<group>"; };
+		A6AE5BCD2E906212005DEBA5 /* ConversationCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationCellView.swift; sourceTree = "<group>"; };
+		A6AE5BD02E90626C005DEBA5 /* FeatureCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureCellView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A67C4F8A2E8FFF1F00100FB6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A67C4FE92E9001AB00100FB6 /* Alamofire in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A67C4F842E8FFF1F00100FB6 = {
+			isa = PBXGroup;
+			children = (
+				A67C4FD52E90000200100FB6 /* AiChatBot */,
+				A67C4F8E2E8FFF1F00100FB6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A67C4F8E2E8FFF1F00100FB6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A67C4F8D2E8FFF1F00100FB6 /* AiChatBot.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A67C4FC62E90000200100FB6 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				A67C4FC12E90000200100FB6 /* Inter-Bold.ttf */,
+				A67C4FC22E90000200100FB6 /* Inter-Light.ttf */,
+				A67C4FC32E90000200100FB6 /* Inter-Medium.ttf */,
+				A67C4FC42E90000200100FB6 /* Inter-Regular.ttf */,
+				A67C4FC52E90000200100FB6 /* Inter-SemiBold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		A67C4FC92E90000200100FB6 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				A67C4FC82E90000200100FB6 /* FontsManager.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		A67C4FCD2E90000200100FB6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				A6AE5BCA2E905D55005DEBA5 /* FeatureManager.swift */,
+				A67C4FD32E90000200100FB6 /* AudioWaveManager.swift */,
+				A67C4FCA2E90000200100FB6 /* ConversationManager.swift */,
+				A67C4FCC2E90000200100FB6 /* PersistenceController.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		A67C4FD02E90000200100FB6 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A6A8912E2E90455200A6725A /* CoreAiView.swift */,
+				A6A8912A2E90437F00A6725A /* MainContainer.swift */,
+				A67C4FCE2E90000200100FB6 /* ChatWithAIView.swift */,
+				A67C4FCF2E90000200100FB6 /* SideMenuView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A67C4FD52E90000200100FB6 /* AiChatBot */ = {
+			isa = PBXGroup;
+			children = (
+				A6AE5BCE2E906212005DEBA5 /* CustomCellViews */,
+				A6AE5BC92E9055BF005DEBA5 /* Info.plist */,
+				A67C4FCB2E90000200100FB6 /* Model.xcdatamodeld */,
+				A67C4FC62E90000200100FB6 /* Fonts */,
+				A67C4FC92E90000200100FB6 /* Helpers */,
+				A67C4FCD2E90000200100FB6 /* Model */,
+				A67C4FD02E90000200100FB6 /* Views */,
+				A67C4FD12E90000200100FB6 /* AiChatBotApp.swift */,
+				A67C4FD22E90000200100FB6 /* Assets.xcassets */,
+				A61568FF2E9A92E30022E09E /* Secrets.xcconfig */,
+			);
+			path = AiChatBot;
+			sourceTree = "<group>";
+		};
+		A6AE5BCE2E906212005DEBA5 /* CustomCellViews */ = {
+			isa = PBXGroup;
+			children = (
+				A6AE5BD02E90626C005DEBA5 /* FeatureCellView.swift */,
+				A6AE5BCD2E906212005DEBA5 /* ConversationCellView.swift */,
+			);
+			path = CustomCellViews;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A67C4F8C2E8FFF1F00100FB6 /* AiChatBot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A67C4F9D2E8FFF2100100FB6 /* Build configuration list for PBXNativeTarget "AiChatBot" */;
+			buildPhases = (
+				A67C4F892E8FFF1F00100FB6 /* Sources */,
+				A67C4F8A2E8FFF1F00100FB6 /* Frameworks */,
+				A67C4F8B2E8FFF1F00100FB6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AiChatBot;
+			packageProductDependencies = (
+				A67C4FE82E9001AB00100FB6 /* Alamofire */,
+			);
+			productName = AiChatBot;
+			productReference = A67C4F8D2E8FFF1F00100FB6 /* AiChatBot.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A67C4F852E8FFF1F00100FB6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					A67C4F8C2E8FFF1F00100FB6 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+				};
+			};
+			buildConfigurationList = A67C4F882E8FFF1F00100FB6 /* Build configuration list for PBXProject "AiChatBot" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A67C4F842E8FFF1F00100FB6;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A67C4FE72E9001AB00100FB6 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A67C4F8E2E8FFF1F00100FB6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A67C4F8C2E8FFF1F00100FB6 /* AiChatBot */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A67C4F8B2E8FFF1F00100FB6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A61569002E9A92E30022E09E /* Secrets.xcconfig in Resources */,
+				A67C4FE12E90000200100FB6 /* Inter-Bold.ttf in Resources */,
+				A67C4FE22E90000200100FB6 /* Inter-Light.ttf in Resources */,
+				A67C4FE32E90000200100FB6 /* Inter-Medium.ttf in Resources */,
+				A67C4FE42E90000200100FB6 /* Inter-Regular.ttf in Resources */,
+				A67C4FE52E90000200100FB6 /* Inter-SemiBold.ttf in Resources */,
+				A67C4FE62E90000200100FB6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A67C4F892E8FFF1F00100FB6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A67C4FD82E90000200100FB6 /* FontsManager.swift in Sources */,
+				A67C4FD92E90000200100FB6 /* ConversationManager.swift in Sources */,
+				A6AE5BCB2E905D5D005DEBA5 /* FeatureManager.swift in Sources */,
+				A6AE5BCF2E906212005DEBA5 /* ConversationCellView.swift in Sources */,
+				A67C4FDA2E90000200100FB6 /* Model.xcdatamodeld in Sources */,
+				A67C4FDB2E90000200100FB6 /* PersistenceController.swift in Sources */,
+				A67C4FDC2E90000200100FB6 /* ChatWithAIView.swift in Sources */,
+				A6AE5BD12E906273005DEBA5 /* FeatureCellView.swift in Sources */,
+				A6A8912F2E90456000A6725A /* CoreAiView.swift in Sources */,
+				A67C4FDD2E90000200100FB6 /* SideMenuView.swift in Sources */,
+				A6A8912B2E9043A200A6725A /* MainContainer.swift in Sources */,
+				A67C4FDE2E90000200100FB6 /* AiChatBotApp.swift in Sources */,
+				A67C4FDF2E90000200100FB6 /* AudioWaveManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A67C4F9B2E8FFF2100100FB6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A61568FF2E9A92E30022E09E /* Secrets.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = L7Y2SDAK8V;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.7;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A67C4F9C2E8FFF2100100FB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A61568FF2E9A92E30022E09E /* Secrets.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = L7Y2SDAK8V;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.7;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A67C4F9E2E8FFF2100100FB6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L7Y2SDAK8V;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AiChatBot/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs microphone for recording audio.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = GHT.AiChatBot;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A67C4F9F2E8FFF2100100FB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L7Y2SDAK8V;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AiChatBot/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs microphone for recording audio.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = GHT.AiChatBot;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A67C4F882E8FFF1F00100FB6 /* Build configuration list for PBXProject "AiChatBot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A67C4F9B2E8FFF2100100FB6 /* Debug */,
+				A67C4F9C2E8FFF2100100FB6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A67C4F9D2E8FFF2100100FB6 /* Build configuration list for PBXNativeTarget "AiChatBot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A67C4F9E2E8FFF2100100FB6 /* Debug */,
+				A67C4F9F2E8FFF2100100FB6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A67C4FE72E9001AB00100FB6 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A67C4FE82E9001AB00100FB6 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A67C4FE72E9001AB00100FB6 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		A67C4FCB2E90000200100FB6 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				A67C4FD62E90000200100FB6 /* Model.xcdatamodel */,
+			);
+			currentVersion = A67C4FD62E90000200100FB6 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = A67C4F852E8FFF1F00100FB6 /* Project object */;
+}

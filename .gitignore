@@ -1,0 +1,9 @@
+# Ignore secret keys
+Secrets.xcconfig
+
+# Xcode build junk
+DerivedData/
+build/
+*.xcuserstate
+*.xcuserdata/
+
