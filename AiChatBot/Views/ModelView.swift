@@ -8,8 +8,6 @@
 import SwiftUI
 import Combine
 
-import SwiftUI
-
 class ModelManager: ObservableObject {
     
     @AppStorage("selectedModel")

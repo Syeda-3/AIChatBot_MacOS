@@ -13,11 +13,14 @@ struct CoreAIView: View {
     @State private var inputText: String = ""
     @State private var editorHeight: CGFloat = 145
     @State private var isGenerating = false
-    @State private var selectedFeature: CoreAIFeature = .summarization
+    @State private var selectedFeature: CoreAIFeature? = nil
+    @State private var selectedSubFeature: SubFeature? = nil
     
     @EnvironmentObject var convoManager: ConversationManager
     @Environment(\.managedObjectContext) private var viewContext
     
+    @State private var showSubscription = false
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -25,41 +28,18 @@ struct CoreAIView: View {
             HStack(spacing: 0) {
                 Spacer()
                 // Sidebar
-                VStack(spacing: 0) {
-                    Text("Features")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                    
-                    Spacer()
-                    ScrollView {
-                        VStack(spacing: 8) {
-                            ForEach(CoreAIFeature.allCases) { feature in
-                                FeatureCellView(
-                                    isSelected: selectedFeature == feature,
-                                    title: feature.rawValue
-                                ) {
-                                    selectedFeature = feature
-                                    convoManager.resetConversation()
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 8)
-                }
-                .frame(width: 250)
-                .background(Color("BgColor"))
-                .cornerRadius(12)
-                .padding(.vertical, 8)
+                FeatureSidebar(selectedFeature: $selectedFeature,
+                               selectedSubFeature: $selectedSubFeature,
+                               convoManager: convoManager)
                 
                 VStack {
-                HStack {
-                    Spacer()
-                    ModelSelectorView()
-                        .frame(width: 200)
-                        .padding(.trailing, 16)
-                        .padding(.vertical,8)
-                }
+                    HStack {
+                        Spacer()
+                        ModelSelectorView()
+                            .frame(width: 200)
+                            .padding(.trailing, 16)
+                            .padding(.vertical,8)
+                    }
                     if convoManager.activeConversation == nil {
                         // Welcome screen
                         VStack(alignment: .center){
@@ -71,20 +51,20 @@ struct CoreAIView: View {
                                 .clipShape(Circle())
                                 .shadow(radius: 5)
                             
-                            Text(selectedFeature.rawValue)
+                            Text(selectedFeature?.rawValue ?? "")
                                 .font(.title2)
                                 .bold()
                                 .foregroundColor(.white)
-                            Text(selectedFeature.description)
+                            Text(selectedFeature?.description ?? "")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
+                            subFeatureMenu
                             messageBox
                                 .frame(height: editorHeight)
                                 .padding(.horizontal, 60)
                                 .onChange(of: inputText) { _ in
                                     recalcHeight()
                                 }
-                            
                             Spacer()
                         }
                         .background(Color("BgColor"))
@@ -182,7 +162,7 @@ struct CoreAIView: View {
                                 }
                             }
                             .padding(.bottom, 4)
-                            
+                            subFeatureMenu
                             // Message box
                             messageBox
                                 .frame(height: editorHeight)
@@ -202,8 +182,38 @@ struct CoreAIView: View {
         .onAppear {
             convoManager.resetConversation()
         }
+        .sheet(isPresented: $showSubscription) {
+                   SubscriptionView()
+               }
     }
     
+    private var subFeatureMenu: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let feature = selectedFeature {
+                Menu {
+                    ForEach(feature.subFeatures, id: \.self) { sub in
+                        Button(sub.title) {
+                            selectedSubFeature = sub
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(selectedSubFeature?.title ?? "Select sub-feature")
+                            .foregroundColor(.white)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .background(Color.black)
+                    .cornerRadius(10)
+                }
+            }
+        }
+        .padding(.horizontal, 60)
+    }
+
     // MARK: - Message Box
     private var messageBox: some View {
         VStack(spacing: 12) {
@@ -242,7 +252,10 @@ struct CoreAIView: View {
                     .frame(height: 20)
                     .background(Color.white)
                 
-                Button(action: {sendMessage(feature: selectedFeature)}) {
+                Button(action: {
+//                    sendMessage(feature: selectedFeature ?? .summarization)
+                    showSubscription = true
+                }) {
                     Image("sent")
                         .foregroundColor(.white)
                         .font(.system(size: 18))
@@ -263,18 +276,11 @@ struct CoreAIView: View {
         inputText = ""
         isGenerating = true
         
-        // Check if there’s an active conversation for this feature
         if convoManager.activeConversation == nil {
-            // Create a new conversation
             convoManager.startNewConversation(for: feature, in: viewContext)
-            // Set the title as the first message
             convoManager.activeConversation?.title = text
         }
-        
-        // Add the user message
         convoManager.addMessageToActiveConversation(text, isUser: true)
-        
-        // Call the AI feature
         convoManager.callFeatureAPI(feature: feature, input: text) {
             isGenerating = false
         }
@@ -286,38 +292,3 @@ struct CoreAIView: View {
         editorHeight = min(max(145, newHeight), 400)
     }
 }
-
-enum CoreAIFeature: String, CaseIterable, Identifiable {
-    case summarization = "Text Summarization"
-    case paraphrasing = "Paraphrasing & Rewriting"
-    case grammar = "Grammar & Style Checking"
-    case translation = "Language Translation"
-    case contentGen = "Content Generation"
-    case codeAssist = "Code Assistance"
-    case imageUnderstanding = "Image Understanding"
-    case documentUnderstanding = "Document Understanding"
-    
-    var id: String { rawValue }
-    
-    var description: String {
-        switch self {
-        case .summarization:
-            return "Quickly condense long articles, PDFs, or chats into key points."
-        case .paraphrasing:
-            return "Rephrase or rewrite text with better clarity and tone."
-        case .grammar:
-            return "Check and refine your grammar, spelling, and style."
-        case .translation:
-            return "Translate text across multiple languages accurately."
-        case .contentGen:
-            return "Generate blog posts, captions, or creative writing."
-        case .codeAssist:
-            return "Get help writing, explaining, or fixing your code."
-        case .imageUnderstanding:
-            return "Analyze or describe image content."
-        case .documentUnderstanding:
-            return "Understand and extract insights from long documents."
-        }
-    }
-}
-

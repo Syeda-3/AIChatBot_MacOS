@@ -151,7 +151,7 @@ struct ChatWithAIView: View {
                                                     Spacer()
                                                 }
                                             }
-                                            .id(msg.id) // important for scrolling
+                                            .id(msg.id) 
                                         }
                                     }
                                     .padding()
@@ -223,7 +223,6 @@ struct ChatWithAIView: View {
                                 .padding()
                                 .onChange(of: inputText) { _ in recalcHeight() }
                         }
-//                        .padding()
                         .background(Color("BgColor"))
                         .cornerRadius(12)
                         .padding(.horizontal)
@@ -358,9 +357,7 @@ struct ChatWithAIView: View {
     
     
     // MARK: - Functions
-    
-    // MARK: - Send Message
-    
+        
     private func sendMessage() {
         
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -414,7 +411,6 @@ struct ChatWithAIView: View {
         newTitle = convo.title ?? ""
     }
     
-    // MARK: - Height Recalc
     private func recalcHeight() {
         let lineCount = max(1, inputText.split(separator: "\n").count)
         let newHeight = CGFloat(30 * lineCount + 100)

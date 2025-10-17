@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		A61569002E9A92E30022E09E /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A61568FF2E9A92E30022E09E /* Secrets.xcconfig */; };
 		A6243A562E9AAB75009AA0C2 /* ModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6243A552E9AAB6E009AA0C2 /* ModelView.swift */; };
+		A62516B02EA1B408001070D6 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62516AF2EA1B408001070D6 /* StoreKit.framework */; };
+		A62516B32EA1B849001070D6 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62516B22EA1B844001070D6 /* SubscriptionManager.swift */; };
+		A62B575E2E9B373E00711DC7 /* FeatureSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62B575D2E9B373B00711DC7 /* FeatureSidebar.swift */; };
+		A62B57602E9BC30E00711DC7 /* CoreAiFeatureModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62B575F2E9BC2F700711DC7 /* CoreAiFeatureModel.swift */; };
+		A63AC10F2E9CE851005A507D /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A63AC10E2E9CE849005A507D /* SubscriptionView.swift */; };
 		A67C4FD82E90000200100FB6 /* FontsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FC82E90000200100FB6 /* FontsManager.swift */; };
 		A67C4FD92E90000200100FB6 /* ConversationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCA2E90000200100FB6 /* ConversationManager.swift */; };
 		A67C4FDA2E90000200100FB6 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCB2E90000200100FB6 /* Model.xcdatamodeld */; };
@@ -34,6 +39,12 @@
 /* Begin PBXFileReference section */
 		A61568FF2E9A92E30022E09E /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		A6243A552E9AAB6E009AA0C2 /* ModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelView.swift; sourceTree = "<group>"; };
+		A62516AF2EA1B408001070D6 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		A62516B12EA1B466001070D6 /* StoreKitTesting.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKitTesting.storekit; sourceTree = "<group>"; };
+		A62516B22EA1B844001070D6 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
+		A62B575D2E9B373B00711DC7 /* FeatureSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureSidebar.swift; sourceTree = "<group>"; };
+		A62B575F2E9BC2F700711DC7 /* CoreAiFeatureModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAiFeatureModel.swift; sourceTree = "<group>"; };
+		A63AC10E2E9CE849005A507D /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
 		A67C4F8D2E8FFF1F00100FB6 /* AiChatBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AiChatBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A67C4FC12E90000200100FB6 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
 		A67C4FC22E90000200100FB6 /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
@@ -63,16 +74,27 @@
 			buildActionMask = 2147483647;
 			files = (
 				A67C4FE92E9001AB00100FB6 /* Alamofire in Frameworks */,
+				A62516B02EA1B408001070D6 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A62516AE2EA1B408001070D6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A62516AF2EA1B408001070D6 /* StoreKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A67C4F842E8FFF1F00100FB6 = {
 			isa = PBXGroup;
 			children = (
+				A62516B12EA1B466001070D6 /* StoreKitTesting.storekit */,
 				A67C4FD52E90000200100FB6 /* AiChatBot */,
+				A62516AE2EA1B408001070D6 /* Frameworks */,
 				A67C4F8E2E8FFF1F00100FB6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -100,8 +122,10 @@
 		A67C4FC92E90000200100FB6 /* Helper Managers */ = {
 			isa = PBXGroup;
 			children = (
+				A62516B22EA1B844001070D6 /* SubscriptionManager.swift */,
 				A67C4FD32E90000200100FB6 /* AudioWaveManager.swift */,
 				A67C4FCA2E90000200100FB6 /* ConversationManager.swift */,
+				A62B575F2E9BC2F700711DC7 /* CoreAiFeatureModel.swift */,
 				A67C4FC82E90000200100FB6 /* FontsManager.swift */,
 				A67C4FCC2E90000200100FB6 /* PersistenceController.swift */,
 				A6AE5BCA2E905D55005DEBA5 /* FeatureManager.swift */,
@@ -112,6 +136,8 @@
 		A67C4FD02E90000200100FB6 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A63AC10E2E9CE849005A507D /* SubscriptionView.swift */,
+				A62B575D2E9B373B00711DC7 /* FeatureSidebar.swift */,
 				A6243A552E9AAB6E009AA0C2 /* ModelView.swift */,
 				A6A8912E2E90455200A6725A /* CoreAiView.swift */,
 				A6A8912A2E90437F00A6725A /* MainContainer.swift */,
@@ -231,12 +257,16 @@
 				A67C4FD82E90000200100FB6 /* FontsManager.swift in Sources */,
 				A67C4FD92E90000200100FB6 /* ConversationManager.swift in Sources */,
 				A6AE5BCB2E905D5D005DEBA5 /* FeatureManager.swift in Sources */,
+				A63AC10F2E9CE851005A507D /* SubscriptionView.swift in Sources */,
+				A62B57602E9BC30E00711DC7 /* CoreAiFeatureModel.swift in Sources */,
 				A6AE5BCF2E906212005DEBA5 /* ConversationCellView.swift in Sources */,
 				A67C4FDA2E90000200100FB6 /* Model.xcdatamodeld in Sources */,
 				A67C4FDB2E90000200100FB6 /* PersistenceController.swift in Sources */,
+				A62B575E2E9B373E00711DC7 /* FeatureSidebar.swift in Sources */,
 				A67C4FDC2E90000200100FB6 /* ChatWithAIView.swift in Sources */,
 				A6AE5BD12E906273005DEBA5 /* FeatureCellView.swift in Sources */,
 				A6A8912F2E90456000A6725A /* CoreAiView.swift in Sources */,
+				A62516B32EA1B849001070D6 /* SubscriptionManager.swift in Sources */,
 				A67C4FDD2E90000200100FB6 /* SideMenuView.swift in Sources */,
 				A6A8912B2E9043A200A6725A /* MainContainer.swift in Sources */,
 				A67C4FDE2E90000200100FB6 /* AiChatBotApp.swift in Sources */,

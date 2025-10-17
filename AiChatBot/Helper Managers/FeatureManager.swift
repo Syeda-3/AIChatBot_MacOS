@@ -9,6 +9,7 @@ import Foundation
 import Alamofire
 
 class APIHandler {
+    
     static let shared = APIHandler()
     private init() {}
     
@@ -52,7 +53,10 @@ class APIHandler {
             "Authorization": "Bearer \(apiKey)",
             "Content-Type": "application/json"
         ]
-        
+        print("param")
+        print(params)
+        print("???")
+
         AF.request(baseURL, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate()
             .responseDecodable(of: ChatCompletionResponse.self) { response in
