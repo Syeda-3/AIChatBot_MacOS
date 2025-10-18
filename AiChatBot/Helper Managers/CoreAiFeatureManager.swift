@@ -7,12 +7,6 @@
 
 import SwiftUI
 
-struct SubFeature: Identifiable, Hashable {
-    let id = UUID()
-    let title: String
-    let prompt: String
-}
-
 enum CoreAIFeature: String, CaseIterable, Identifiable {
     case summarization
     case paraphrasing
@@ -20,6 +14,7 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
     case translation
     case contentGen
     case codeAssist
+    case language
     case imageUnderstanding
     case documentUnderstanding
 
@@ -36,6 +31,7 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
         case .codeAssist: return "Code Assistant"
         case .imageUnderstanding: return "Image Understanding"
         case .documentUnderstanding: return "Document Understanding"
+        case .language: return "Language"
         }
     }
 
@@ -57,6 +53,8 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
             return "Analyze and describe image content."
         case .documentUnderstanding:
             return "Extract insights or summaries from complex documents."
+        case .language:
+            return "Translate text into specific target languages with full accuracy."
         }
     }
 
@@ -79,6 +77,8 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
             return "Describe what’s happening in the image."
         case .documentUnderstanding:
             return "Extract key insights from the provided document."
+        case .language:
+            return "Translate the following text accurately into the selected language."
         }
     }
 
@@ -185,8 +185,42 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
                         prompt: "Summarize the document clearly and concisely, capturing the key ideas, tone, and important details while removing redundancy."
                     )
                 ]
+            
+        case .language:
+            return LanguageLoader.loadLanguages()
 
         default:
+            return []
+        }
+    }
+}
+
+// MARK: - SubFeature model
+struct SubFeature: Identifiable, Hashable {
+    let id = UUID()
+    let title: String
+    let prompt: String
+}
+
+// MARK: - Loader for languages
+struct LanguageData: Codable {
+    let name: String
+    let prompt: String
+}
+
+class LanguageLoader {
+    
+    static func loadLanguages() -> [SubFeature] {
+        guard let url = Bundle.main.url(forResource: "languages", withExtension: "json") else {
+            print("❌ languages.json not found")
+            return []
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            let decoded = try JSONDecoder().decode([LanguageData].self, from: data)
+            return decoded.map { SubFeature(title: $0.name, prompt: $0.prompt) }
+        } catch {
+            print("❌ Failed to decode languages.json: \(error)")
             return []
         }
     }

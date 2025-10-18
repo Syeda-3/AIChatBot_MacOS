@@ -36,7 +36,10 @@ struct SideMenu: View {
             
             Spacer()
             
-            Button(action: {}) {
+            Button(action: {
+                // subscriptiiion
+                
+            }) {
                 Label("Upgrade Pro", systemImage: "bolt.fill")
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)

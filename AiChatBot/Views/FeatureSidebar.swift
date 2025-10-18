@@ -31,7 +31,6 @@ struct FeatureSidebar: View {
                             ) {
                                 withAnimation(.easeInOut) {
                                     if selectedFeature == feature {
-                                        selectedFeature = nil
                                     } else {
                                         selectedFeature = feature
                                         selectedSubFeature = nil

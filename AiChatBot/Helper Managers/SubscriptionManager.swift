@@ -124,3 +124,4 @@ class SubscriptionManager: ObservableObject {
 enum StoreKitError: Error {
     case verificationFailed
 }
+                                                               

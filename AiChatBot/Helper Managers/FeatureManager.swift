@@ -37,12 +37,15 @@ class APIHandler {
                 systemPrompt = "Analyze or describe image content."
             case .documentUnderstanding:
                 systemPrompt = "Understand and extract insights from long documents."
+        case .language:
+            systemPrompt = "Translate the following text accurately into the selected language."
+
             }
                 
         let model = ModelManager.shared.selectedModelAPIName
 
         let params: [String: Any] = [
-            "model": model,   // or gpt-4
+            "model": model,
             "messages": [
                 ["role": "system", "content": systemPrompt],
                 ["role": "user", "content": input]

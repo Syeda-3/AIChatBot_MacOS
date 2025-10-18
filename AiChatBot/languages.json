@@ -1,0 +1,207 @@
+
+[
+    
+    {
+        "name": "English",
+        "prompt": "Translate the following text into English, preserving tone, meaning, and fluency."
+    },
+    {
+        "name": "Arabic",
+        "prompt": "Translate the following text into Arabic, keeping contextual meaning and linguistic naturalness."
+    },
+    {
+        "name": "Bengali",
+        "prompt": "Translate the following text into Bengali (Bangla), maintaining accuracy and natural phrasing."
+    },
+    {
+        "name": "Bulgarian",
+        "prompt": "Translate the following text into Bulgarian with proper grammar and idiomatic tone."
+    },
+    {
+        "name": "Catalan",
+        "prompt": "Translate the following text into Catalan with clarity and natural flow."
+    },
+    {
+        "name": "Chinese (Simplified)",
+        "prompt": "Translate the following text into Simplified Chinese, ensuring readability and natural phrasing."
+    },
+    {
+        "name": "Chinese (Traditional)",
+        "prompt": "Translate the following text into Traditional Chinese, maintaining natural expression."
+    },
+    {
+        "name": "Croatian",
+        "prompt": "Translate the following text into Croatian, preserving meaning and linguistic style."
+    },
+    {
+        "name": "Czech",
+        "prompt": "Translate the following text into Czech, with correct grammar and fluid phrasing."
+    },
+    {
+        "name": "Danish",
+        "prompt": "Translate the following text into Danish, maintaining clarity and natural tone."
+    },
+    {
+        "name": "Dutch",
+        "prompt": "Translate the following text into Dutch, preserving meaning and readability."
+    },
+    {
+        "name": "Estonian",
+        "prompt": "Translate the following text into Estonian, keeping the phrasing natural."
+    },
+    {
+        "name": "Finnish",
+    "prompt": "Translate the following text into Finnish, with clear and fluent style." },
+    {
+        "name": "French",
+        "prompt": "Translate the following text into French, preserving tone and idiomatic correctness."
+    },
+    {
+        "name": "German",
+        "prompt": "Translate the following text into German, while preserving clarity, tone, and grammatical accuracy."
+    },
+    {
+        "name": "Greek",
+        "prompt": "Translate the following text into Greek, ensuring it reads naturally."
+    },
+    {
+        "name": "Gujarati",
+        "prompt": "Translate the following text into Gujarati, keeping context and tone intact."
+    },
+    {
+        "name": "Hebrew",
+        "prompt": "Translate the following text into Hebrew, preserving meaning and readability."
+    },
+    {
+        "name": "Hindi",
+        "prompt": "Translate the following text into Hindi, maintaining meaning and natural language flow."
+    },
+    {
+        "name": "Hungarian",
+        "prompt": "Translate the following text into Hungarian, preserving meaning and idiomatic phrasing."
+    },
+    {
+        "name": "Icelandic",
+        "prompt": "Translate the following text into Icelandic, ensuring grammatical correctness and natural tone."
+    },
+    {
+        "name": "Indonesian",
+        "prompt": "Translate the following text into Indonesian, preserving meaning and readability."
+    },
+    {
+        "name": "Italian",
+        "prompt": "Translate the following text into Italian, with clarity and idiomatic expression."
+    },
+    {
+        "name": "Japanese",
+        "prompt": "Translate the following text into Japanese, keeping the tone, context, and natural phrasing intact."
+    },
+    {
+        "name": "Kannada",
+        "prompt": "Translate the following text into Kannada, preserving meaning and natural structure."
+    },
+    {
+        "name": "Korean",
+        "prompt": "Translate the following text into Korean, maintaining tone, meaning, and fluency."
+    },
+    {
+        "name": "Latvian",
+        "prompt": "Translate the following text into Latvian, with accurate grammar and natural phrasing."
+    },
+    {
+        "name": "Lithuanian",
+        "prompt": "Translate the following text into Lithuanian, keeping readability and correctness."
+    },
+    {
+        "name": "Malay",
+        "prompt": "Translate the following text into Malay, maintaining clarity and natural phrasing."
+    },
+    {
+        "name": "Malayalam",
+        "prompt": "Translate the following text into Malayalam, preserving context and readability."
+    },
+    {
+        "name": "Marathi",
+        "prompt": "Translate the following text into Marathi, keeping meaning and a natural flow."
+    },
+    {
+        "name": "Nepali",
+        "prompt": "Translate the following text into Nepali, preserving clarity and correct grammar."
+    },
+    {
+        "name": "Norwegian",
+        "prompt": "Translate the following text into Norwegian, ensuring natural tone and fluency."
+    },
+    {
+        "name": "Persian",
+        "prompt": "Translate the following text into Persian (Farsi), preserving meaning, style, and readability."
+    },
+    {
+        "name": "Polish",
+        "prompt": "Translate the following text into Polish, maintaining meaning and natural phrasing."
+    },
+    {
+        "name": "Portuguese",
+        "prompt": "Translate the following text into Portuguese, preserving tone and idiomatic use."
+    },
+    {
+        "name": "Punjabi",
+        "prompt": "Translate the following text into Punjabi, keeping context, tone, and fluency."
+    },
+    {
+        "name": "Romanian",
+        "prompt": "Translate the following text into Romanian, keeping it clear and natural."
+    },
+    {
+        "name": "Russian",
+        "prompt": "Translate the following text into Russian, preserving meaning, tone, and flow."
+    },
+    {
+        "name": "Slovak",
+        "prompt": "Translate the following text into Slovak, maintaining clarity and grammatical correctness."
+    },
+    {
+        "name": "Slovenian",
+        "prompt": "Translate the following text into Slovenian, preserving meaning and readability."
+    },
+    {
+        "name": "Spanish",
+        "prompt": "Translate the following text into Spanish, maintaining tone, nuance, and clarity."
+    },
+    {
+        "name": "Swahili",
+        "prompt": "Translate the following text into Swahili, preserving meaning and readability."
+    },
+    {
+        "name": "Swedish",
+        "prompt": "Translate the following text into Swedish, ensuring natural flow and proper grammar."
+    },
+    {
+        "name": "Tamil",
+        "prompt": "Translate the following text into Tamil, keeping tone, meaning, and readability."
+    },
+    {
+        "name": "Telugu",
+        "prompt": "Translate the following text into Telugu, preserving meaning and a natural tone."
+    },
+    {
+        "name": "Thai",
+        "prompt": "Translate the following text into Thai, maintaining clarity and natural phrasing."
+    },
+    {
+        "name": "Turkish",
+        "prompt": "Translate the following text into Turkish, preserving meaning, grammar, and tone."
+    },
+    {
+        "name": "Ukrainian",
+        "prompt": "Translate the following text into Ukrainian, maintaining meaning and idiomatic phrasing."
+    },
+    {
+        "name": "Urdu",
+        "prompt": "Translate the following text into Urdu, preserving meaning, tone, and cultural context."
+    },
+    {
+        "name": "Vietnamese",
+        "prompt": "Translate the following text into Vietnamese, preserving meaning, tone, and readability."
+    }
+]

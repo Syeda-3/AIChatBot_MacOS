@@ -13,7 +13,7 @@ struct CoreAIView: View {
     @State private var inputText: String = ""
     @State private var editorHeight: CGFloat = 145
     @State private var isGenerating = false
-    @State private var selectedFeature: CoreAIFeature? = nil
+    @State private var selectedFeature: CoreAIFeature? = .summarization
     @State private var selectedSubFeature: SubFeature? = nil
     
     @EnvironmentObject var convoManager: ConversationManager
@@ -58,7 +58,14 @@ struct CoreAIView: View {
                             Text(selectedFeature?.description ?? "")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
-                            subFeatureMenu
+                            HStack {
+                                Spacer()
+                                subFeatureMenu
+                                    .frame(width: 230)
+                                    .padding(.trailing, 16)
+                                    .padding(.vertical,4)
+                            }
+
                             messageBox
                                 .frame(height: editorHeight)
                                 .padding(.horizontal, 60)
@@ -162,7 +169,14 @@ struct CoreAIView: View {
                                 }
                             }
                             .padding(.bottom, 4)
-                            subFeatureMenu
+                            HStack {
+                                Spacer()
+                                subFeatureMenu
+                                    .frame(width: 230)
+                                    .padding(.trailing, 16)
+                                    .padding(.vertical,4)
+                            }
+
                             // Message box
                             messageBox
                                 .frame(height: editorHeight)
@@ -188,7 +202,8 @@ struct CoreAIView: View {
     }
     
     private var subFeatureMenu: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        HStack(spacing: 10) {
+            Spacer()
             if let feature = selectedFeature {
                 Menu {
                     ForEach(feature.subFeatures, id: \.self) { sub in
@@ -198,20 +213,24 @@ struct CoreAIView: View {
                     }
                 } label: {
                     HStack {
-                        Text(selectedSubFeature?.title ?? "Select sub-feature")
+                        Text(selectedSubFeature?.title ?? "Select")
                             .foregroundColor(.white)
-                        Spacer()
-                        Image(systemName: "chevron.down")
-                            .foregroundColor(.gray)
+                            .font(.system(size: 16, weight: .medium))
                     }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 12)
-                    .background(Color.black)
-                    .cornerRadius(10)
+                    .padding(.vertical, 4)
                 }
+                .menuStyle(.borderlessButton)
             }
         }
-        .padding(.horizontal, 60)
+        .padding(.trailing, 16)
+        .padding(.vertical, 10)
+        .background(Color(.darkGray).opacity(0.5))
+        .cornerRadius(24)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 2)
     }
 
     // MARK: - Message Box
