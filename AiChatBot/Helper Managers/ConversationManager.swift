@@ -11,8 +11,8 @@ import SwiftUI
 import Combine
 import Alamofire
 
-
 class ConversationManager: ObservableObject {
+    
     private let viewContext: NSManagedObjectContext
     
     @Published var conversations: [Conversation] = []
@@ -82,18 +82,25 @@ class ConversationManager: ObservableObject {
         fetchAllConversations()
     }
     
-    // MARK: - Messages
-    func addMessage(to convo: Conversation, text: String, isUser: Bool) {
+    func addMessage(to convo: Conversation, text: String? = nil, isUser: Bool, fileURL: URL? = nil, fileType: String? = nil ) {
         let msg = Message(context: viewContext)
         msg.id = UUID()
         msg.text = text
         msg.isUser = isUser
         msg.timeStamp = Date()
         msg.conversation = convo
+
+        if let fileURL = fileURL {
+            msg.fileURL = fileURL.absoluteString
+        }
+        if let fileType = fileType {
+            msg.fileType = fileType
+        }
+
         save()
         fetchAllConversations()
     }
-    
+
     func resetConversation() {
         activeConversation = nil
     }
@@ -131,11 +138,7 @@ class ConversationManager: ObservableObject {
         // Cancel previous request if running
         currentRequest?.cancel()
         
-        currentRequest = AF.request(url,
-                                    method: .post,
-                                    parameters: parameters,
-                                    encoding: JSONEncoding.default,
-                                    headers: headers)
+        currentRequest = AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
             .validate()
             .responseDecodable(of: OpenAIChatResponse.self) { response in
                 defer { DispatchQueue.main.async { completion?() } }
@@ -150,7 +153,8 @@ class ConversationManager: ObservableObject {
                 case .failure(let error):
                     if error.isExplicitlyCancelledError {
                         print("⚠️ Request cancelled")
-                    } else {
+                    }
+                    else {
                         print("❌ Alamofire error:", error.localizedDescription)
                         if let data = response.data {
                             print("Response data:", String(data: data, encoding: .utf8) ?? "")
@@ -182,55 +186,6 @@ class ConversationManager: ObservableObject {
             }
         }
     }
-
-    // MARK: - Image Generation
-    func generateImage(prompt: String, completion: @escaping (String?) -> Void) {
-        let url = "\(baseURL)/images/generations"
-
-        let json: [String: Any] = ["model": "gpt-image-1", "prompt": prompt]
-        
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(apiKey)",
-            "Content-Type": "application/json"
-        ]
-        
-        AF.request(url,
-                   method: .post,
-                   parameters: json,
-                   encoding: JSONEncoding.default,
-                   headers: headers)
-        .responseString { response in
-            switch response.result {
-            case .success(let value):
-                completion(value)
-            case .failure(let error):
-                print("❌ Image generation failed:", error.localizedDescription)
-                completion(nil)
-            }
-        }
-    }
-    
-    // MARK: - Document Upload
-    func uploadDocument(fileURL: URL, completion: @escaping (String?) -> Void) {
-        let endpoint = "\(baseURL)/files"
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(apiKey)"
-        ]
-        
-        AF.upload(multipartFormData: { multipart in
-            multipart.append(fileURL, withName: "file")
-            multipart.append("fine-tune".data(using: .utf8)!, withName: "purpose")
-        }, to: endpoint, headers: headers)
-        .responseString { response in
-            switch response.result {
-            case .success(let result):
-                completion(result)
-            case .failure(let error):
-                print("❌ Document upload failed:", error.localizedDescription)
-                completion(nil)
-            }
-        }
-    }
     
     // MARK: - Helpers
     private func save() {
@@ -251,18 +206,50 @@ class ConversationManager: ObservableObject {
         struct Choice: Codable, Sendable {
             let message: ChatMessage
         }
+
         struct ChatMessage: Codable, Sendable {
             let role: String
-            let content: String
+
+            // For normal chat messages
+            let content: String?
+
+            // For multimodal messages (with image/document parts)
+            let contentParts: [ContentPart]?
+
+            struct ContentPart: Codable, Sendable {
+                let type: String              // "text" or "image_url"
+                let text: String?             // when type == "text"
+                let image_url: ImageURL?      // when type == "image_url"
+
+                struct ImageURL: Codable, Sendable {
+                    let url: String
+                }
+            }
+
+            // Custom decoder for backward compatibility
+            init(from decoder: Decoder) throws {
+                let container = try decoder.container(keyedBy: CodingKeys.self)
+                role = try container.decode(String.self, forKey: .role)
+                // Try to decode text-only or structured array content
+                if let textContent = try? container.decode(String.self, forKey: .content) {
+                    content = textContent
+                    contentParts = nil
+                } else {
+                    content = nil
+                    contentParts = try? container.decode([ContentPart].self, forKey: .content)
+                }
+            }
         }
+
         let choices: [Choice]
     }
-    
+
     nonisolated(unsafe)
     struct TranscriptionResponse: Codable, Sendable {
         let text: String
     }
 }
+
 // MARK: - Feature-Based Conversations
 extension ConversationManager {
     
@@ -288,9 +275,8 @@ extension ConversationManager {
         save()
     }
     
-    func callFeatureAPI(feature: CoreAIFeature, input: String, completion: @escaping () -> Void) {
-        // 🔹 Adjust this to match your own APIHandler structure if needed
-        APIHandler.shared.callFeatureAPI(feature: feature, input: input) { result in
+    func callFeatureAPI(systemPrompt: String, input: String, completion: @escaping () -> Void) {
+        APIHandler.shared.callFeatureAPI(systemPrompt: systemPrompt, input: input) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let output):
@@ -302,6 +288,35 @@ extension ConversationManager {
             }
         }
     }
+    
+    func callImageUnderstandingAPI(systemPrompt: String, input: String, fileURL: URL, completion: @escaping () -> Void) {
+        APIHandler.shared.callImageUnderstandingAPI(systemPrompt: systemPrompt, input: input, fileURL: fileURL) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let output):
+                    self.addMessageToActiveConversation(output, isUser: false,)
+                case .failure(let error):
+                    self.addMessageToActiveConversation("❌ Error: \(error.localizedDescription)", isUser: false)
+                }
+                completion()
+            }
+        }
+    }
+
+    func callDocumentUnderstandingAPI(systemPrompt: String, input: String, fileURL: URL, completion: @escaping () -> Void) {
+        APIHandler.shared.callDocumentUnderstandingAPI(systemPrompt: systemPrompt, input: input, fileURL: fileURL) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let output):
+                    self.addMessageToActiveConversation(output, isUser: false)
+                case .failure(let error):
+                    self.addMessageToActiveConversation("❌ Error: \(error.localizedDescription)", isUser: false)
+                }
+                completion()
+            }
+        }
+    }
+
 }
 
 // MARK: - Data Appending for Multipart

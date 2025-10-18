@@ -316,30 +316,30 @@ struct ChatWithAIView: View {
                 
                 Spacer()
                 
-                Button(action: {}) {
-                    Image("image").foregroundColor(.gray)
-                }
-                .buttonStyle(.plain)
+//                Button(action: {}) {
+//                    Image("image").foregroundColor(.gray)
+//                }
+//                .buttonStyle(.plain)
                 
-                Button(action: {
-                    if recorder.isRecording {
-                        recorder.stop()
-                        showWaveform = false
-                    }
-                    else {
-                        recorder.requestAndStart()
-                        showWaveform = true
-                    }
-                }) {
-                    Image("voice")
-                        .foregroundColor(showWaveform ? .red : .gray)
-                }
-                .buttonStyle(.plain)
+//                Button(action: {
+//                    if recorder.isRecording {
+//                        recorder.stop()
+//                        showWaveform = false
+//                    }
+//                    else {
+//                        recorder.requestAndStart()
+//                        showWaveform = true
+//                    }
+//                }) {
+//                    Image("voice")
+//                        .foregroundColor(showWaveform ? .red : .gray)
+//                }
+//                .buttonStyle(.plain)
                 
                 
-                Divider()
-                    .frame(height: 20)
-                    .background(Color.white)
+//                Divider()
+//                    .frame(height: 20)
+//                    .background(Color.white)
                 
                 Button(action: {sendMessage()}) {
                     Image("sent")

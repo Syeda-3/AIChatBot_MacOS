@@ -7,6 +7,8 @@
 
 import SwiftUI
 import Combine
+import UniformTypeIdentifiers
+import AppKit
 
 struct CoreAIView: View {
     
@@ -20,7 +22,9 @@ struct CoreAIView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @State private var showSubscription = false
-
+    @State private var selectedFile: URL?
+    @State private var imagePreview: NSImage?
+    
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -65,7 +69,7 @@ struct CoreAIView: View {
                                     .padding(.trailing, 16)
                                     .padding(.vertical,4)
                             }
-
+                            
                             messageBox
                                 .frame(height: editorHeight)
                                 .padding(.horizontal, 60)
@@ -176,7 +180,7 @@ struct CoreAIView: View {
                                     .padding(.trailing, 16)
                                     .padding(.vertical,4)
                             }
-
+                            
                             // Message box
                             messageBox
                                 .frame(height: editorHeight)
@@ -197,8 +201,11 @@ struct CoreAIView: View {
             convoManager.resetConversation()
         }
         .sheet(isPresented: $showSubscription) {
-                   SubscriptionView()
-               }
+            SubscriptionView()
+        }
+        .onChange(of: selectedFeature) { _ in
+            resetMessageBox()
+        }
     }
     
     private var subFeatureMenu: some View {
@@ -232,16 +239,58 @@ struct CoreAIView: View {
         )
         .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 2)
     }
-
+    
     // MARK: - Message Box
     private var messageBox: some View {
         VStack(spacing: 12) {
             
+            // MARK: - File Preview
+            if let file = selectedFile {
+                ZStack(alignment: .topTrailing) {
+                    if let image = imagePreview {
+                        Image(nsImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: 180, maxHeight: 180)
+                            .cornerRadius(12)
+                            .shadow(radius: 4)
+                    } else {
+                        VStack(spacing: 8) {
+                            Image(systemName: "doc.text")
+                                .font(.system(size: 36))
+                                .foregroundColor(.gray)
+                            Text(file.lastPathComponent)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                        .padding()
+                        .frame(width: 180, height: 180)
+                        .background(Color.gray.opacity(0.15))
+                        .cornerRadius(12)
+                    }
+                    
+                    Button {
+                        selectedFile = nil
+                        imagePreview = nil
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.white)
+                            .background(Color.black.opacity(0.6))
+                            .clipShape(Circle())
+                    }
+                    .offset(x: -8, y: 8)
+                    .buttonStyle(.plain)
+                }
+                .transition(.opacity)
+            }
+            
+            // MARK: - Text Input
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $inputText)
                     .scrollContentBackground(.hidden)
                     .padding(.vertical, 8)
-                    .frame(minHeight: 40, maxHeight: 120, alignment: .center)
+                    .frame(minHeight: 40, maxHeight: 120)
                     .background(Color.clear)
                     .foregroundColor(.white)
                 
@@ -253,27 +302,21 @@ struct CoreAIView: View {
                 }
             }
             
-            // Bottom row of buttons
+            // MARK: - Buttons Row
             HStack(spacing: 16) {
-                Button(action: {}) {
-                    Image("link").foregroundColor(.gray)
+                
+                // Only show link button for Image & Document Understanding
+                if selectedFeature == .imageUnderstanding || selectedFeature == .documentUnderstanding {
+                    Button(action: openFilePicker) {
+                        Image("link").foregroundColor(.gray)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
                 
                 Spacer()
                 
-                Button(action: {}) {
-                    Image("image").foregroundColor(.gray)
-                }
-                .buttonStyle(.plain)
-                
-                Divider()
-                    .frame(height: 20)
-                    .background(Color.white)
-                
                 Button(action: {
-//                    sendMessage(feature: selectedFeature ?? .summarization)
-                    showSubscription = true
+                    sendMessage(feature: selectedFeature ?? .summarization)
                 }) {
                     Image("sent")
                         .foregroundColor(.white)
@@ -286,22 +329,72 @@ struct CoreAIView: View {
         .padding(.vertical, 8)
         .background(Color.black)
         .cornerRadius(16)
+        .animation(.easeInOut, value: selectedFile)
     }
     
     private func sendMessage(feature: CoreAIFeature) {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
+        guard !text.isEmpty || selectedFile != nil else { return } // allow empty text for image/doc uploads
         
+        // Reset typing state
         inputText = ""
         isGenerating = true
         
+        // Ensure conversation context
         if convoManager.activeConversation == nil {
             convoManager.startNewConversation(for: feature, in: viewContext)
-            convoManager.activeConversation?.title = text
+            convoManager.activeConversation?.title = text.isEmpty ? feature.title : text
         }
-        convoManager.addMessageToActiveConversation(text, isUser: true)
-        convoManager.callFeatureAPI(feature: feature, input: text) {
-            isGenerating = false
+        
+        // Add user message if text is present
+        if !text.isEmpty {
+            convoManager.addMessageToActiveConversation(text, isUser: true)
+        }
+        
+        // MARK: - Select proper prompt
+        var systemPrompt: String
+        if let sub = selectedSubFeature {
+            systemPrompt = sub.prompt
+        } else {
+            systemPrompt = feature.basePrompt
+        }
+        
+        // MARK: - Route based on feature type
+        switch feature {
+        case .imageUnderstanding:
+            guard let fileURL = selectedFile else {
+                print("⚠️ No image selected")
+                isGenerating = false
+                return
+            }
+            convoManager.callImageUnderstandingAPI(
+                systemPrompt: systemPrompt, input: text,
+                fileURL: fileURL
+            ) {
+                isGenerating = false
+            }
+
+        case .documentUnderstanding:
+            guard let fileURL = selectedFile else {
+                print("⚠️ No document selected")
+                isGenerating = false
+                return
+            }
+            convoManager.callDocumentUnderstandingAPI(
+                systemPrompt: systemPrompt, input: text,
+                fileURL: fileURL
+            ) {
+                isGenerating = false
+            }
+
+        default:
+            // Normal text-based flow
+            convoManager.callFeatureAPI(
+                systemPrompt: systemPrompt,
+                input: text
+            ) {
+                isGenerating = false
+            }
         }
     }
     
@@ -310,4 +403,51 @@ struct CoreAIView: View {
         let newHeight = CGFloat(30 * lineCount + 100)
         editorHeight = min(max(145, newHeight), 400)
     }
+    
+    private func resetMessageBox() {
+        inputText = ""
+        selectedFile = nil
+        imagePreview = nil
+    }
+    
+    private func openFilePicker() {
+        guard let selectedFeature else { return }
+        
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        
+        switch selectedFeature {
+        case .imageUnderstanding:
+            panel.title = "Select Image"
+            panel.allowedContentTypes = [.png, .jpeg]
+            
+        case .documentUnderstanding:
+            panel.allowedContentTypes = [.pdf, .text,
+                                         UTType(filenameExtension: "doc")!,
+                                         UTType(filenameExtension: "docx")!]
+            
+        default:
+            return // do nothing for other features
+        }
+        
+        if panel.runModal() == .OK, let url = panel.url {
+            selectedFile = url
+            if selectedFeature == .imageUnderstanding, let image = NSImage(contentsOf: url) {
+                imagePreview = image
+            } else {
+                imagePreview = nil
+            }
+        }
+    }
+    
+    private func loadImagePreview(from url: URL) {
+        if let image = NSImage(contentsOf: url),
+           let type = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType,
+           type.conforms(to: .image) {
+            imagePreview = image
+        } else {
+            imagePreview = nil
+        }
+    }
+    
 }
