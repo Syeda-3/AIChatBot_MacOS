@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ConversationCellView: View {
+    
     @ObservedObject var convo: Conversation
     var isSelected: Bool
     var onSelect: () -> Void

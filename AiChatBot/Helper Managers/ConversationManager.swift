@@ -10,6 +10,7 @@ import CoreData
 import SwiftUI
 import Combine
 import Alamofire
+import StoreKit
 
 class ConversationManager: ObservableObject {
     
@@ -17,15 +18,41 @@ class ConversationManager: ObservableObject {
     
     @Published var conversations: [Conversation] = []
     @Published var activeConversation: Conversation?
+    @Published var showSubscription: Bool = false
     private var currentRequest: DataRequest?
     
     let apiKey = Bundle.main.infoDictionary?["API_KEY"] ?? ""
-    
     private let baseURL = "https://api.openai.com/v1"
     
     init(context: NSManagedObjectContext) {
         self.viewContext = context
         fetchAllConversations()
+    }
+    
+    // MARK: - Subscription Gate
+    private func hasActiveSubscription() -> Bool {
+        return SubscriptionManager.shared.currentPlan != nil
+    }
+    
+    private func totalUserMessagesCount() -> Int {
+        let request: NSFetchRequest<Message> = Message.fetchRequest()
+        request.predicate = NSPredicate(format: "isUser == true")
+        return (try? viewContext.count(for: request)) ?? 0
+    }
+    
+    private func canSendMessage() -> Bool {
+        if hasActiveSubscription() { return true }
+        return totalUserMessagesCount() < 5
+    }
+    
+    private func handleSubscriptionLimit() -> Bool {
+        if !canSendMessage() {
+            DispatchQueue.main.async {
+                self.showSubscription = true
+            }
+            return false
+        }
+        return true
     }
     
     // MARK: - Fetch
@@ -82,7 +109,14 @@ class ConversationManager: ObservableObject {
         fetchAllConversations()
     }
     
-    func addMessage(to convo: Conversation, text: String? = nil, isUser: Bool, fileURL: URL? = nil, fileType: String? = nil ) {
+    // MARK: - Message Save
+//    @discardableResult
+    func addMessage(to convo: Conversation,
+                    text: String? = nil,
+                    isUser: Bool,
+                    fileURL: URL? = nil,
+                    fileType: String? = nil) -> Message {
+
         let msg = Message(context: viewContext)
         msg.id = UUID()
         msg.text = text
@@ -91,146 +125,201 @@ class ConversationManager: ObservableObject {
         msg.conversation = convo
 
         if let fileURL = fileURL {
-            msg.fileURL = fileURL.absoluteString
-        }
-        if let fileType = fileType {
+            msg.fileURL = fileURL.path
             msg.fileType = fileType
         }
 
         save()
-        fetchAllConversations()
+        return msg
     }
-
+    
     func resetConversation() {
         activeConversation = nil
     }
     
-    // MARK: - Send to OpenAI (Chat)
-    func sendToOpenAI(text: String, completion: (() -> Void)? = nil) {
+    // MARK: - Standard Chat (text + optional file)
+    func sendMessage(
+        inputText: String?,
+        fileURL: URL? = nil,
+        fileType: String? = nil,
+        regenerateFor userMessage: Message? = nil,
+        completion: (() -> Void)? = nil
+    ) {
         guard let convo = activeConversation else {
             print("⚠️ No active conversation.")
             completion?()
             return
         }
-        
-        let model = ModelManager.shared.selectedModelAPIName
 
-        addMessage(to: convo, text: text, isUser: true)
-        
+        guard handleSubscriptionLimit() else {
+            completion?()
+            return
+        }
+
         let url = "\(baseURL)/chat/completions"
-        let messagesPayload = convo.messagesArray.map { msg in
+
+        // MARK: - Build messages payload
+        var messagesPayload: [[String: Any]] = convo.messagesArray.map { msg in
             [
                 "role": msg.isUser ? "user" : "assistant",
                 "content": msg.text ?? ""
             ]
         }
-        
+
+        var userContent: [[String: Any]] = [["type": "text", "text": inputText as Any]]
+
+        // MARK: - Handle attachments for payload
+        if let fileURL = fileURL {
+            switch fileType {
+            case "image":
+                if let data = try? Data(contentsOf: fileURL) {
+                    let base64 = data.base64EncodedString()
+                    userContent.append([
+                        "type": "image_url",
+                        "image_url": ["url": "data:image/png;base64,\(base64)"]
+                    ])
+                }
+            case "document":
+                userContent.append([
+                    "type": "text",
+                    "text": "[Document attached: \(fileURL.lastPathComponent)]"
+                ])
+            default:
+                break
+            }
+        }
+
+        messagesPayload.append([
+            "role": "user",
+            "content": userContent
+        ])
+
         let parameters: [String: Any] = [
-            "model": model,
+            "model": "gpt-5-mini",
             "messages": messagesPayload
         ]
-        
+
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(apiKey)",
             "Content-Type": "application/json"
         ]
-        
-        // Cancel previous request if running
+
         currentRequest?.cancel()
-        
+
+        // MARK: - Network Request
         currentRequest = AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
             .validate()
             .responseDecodable(of: OpenAIChatResponse.self) { response in
                 defer { DispatchQueue.main.async { completion?() } }
-                
+
                 switch response.result {
                 case .success(let result):
-                    if let reply = result.choices.first?.message.content {
-                        DispatchQueue.main.async {
-                            self.addMessage(to: convo, text: reply, isUser: false)
+                    guard let reply = result.choices.first?.message.content else { return }
+
+                    DispatchQueue.main.async {
+                        if let userMessage = userMessage {
+                            // 🔁 Regeneration: replace existing assistant reply
+                            if let oldAssistant = convo.messagesArray.first(where: { msg in
+                                msg.isUser == false &&
+                                (msg.timeStamp ?? .distantPast) > (userMessage.timeStamp ?? .distantPast)
+                            }) {
+                                oldAssistant.text = reply
+                                self.save()
+                                self.fetchAllConversations()
+                                return
+                            }
                         }
+
+                        // MARK: - Save user message properly
+                        let userMsg = self.addMessage(
+                            to: convo,
+                            text: inputText,
+                            isUser: true,
+                            fileURL: fileURL,
+                            fileType: fileType
+                        )
+                        
+                        // Attach data depending on type
+                        if let fileURL = fileURL, let fileType = fileType {
+                            switch fileType {
+                            case "image":
+                                if let image = NSImage(contentsOf: fileURL),
+                                   let tiff = image.tiffRepresentation,
+                                   let bitmap = NSBitmapImageRep(data: tiff),
+                                   let jpegData = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.6]) {
+                                    userMsg.fileData = jpegData
+                                }
+
+                            case "document":
+                                userMsg.fileURL = fileURL.path
+
+                            default:
+                                break
+                            }
+                            self.save()
+                        }
+                        // Add assistant’s reply
+                        self.addMessage(to: convo, text: reply, isUser: false)
+                        self.fetchAllConversations()
                     }
+
                 case .failure(let error):
-                    if error.isExplicitlyCancelledError {
-                        print("⚠️ Request cancelled")
-                    }
-                    else {
+                    if !error.isExplicitlyCancelledError {
                         print("❌ Alamofire error:", error.localizedDescription)
-                        if let data = response.data {
-                            print("Response data:", String(data: data, encoding: .utf8) ?? "")
-                        }
                     }
                 }
             }
     }
-    
-    // MARK: - Audio Upload (Transcription)
-    func sendAudio(fileURL: URL, completion: @escaping (String?) -> Void) {
-        let endpoint = "\(baseURL)/audio/transcriptions"
 
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(apiKey)"
-        ]
-        
-        AF.upload(multipartFormData: { multipart in
-            multipart.append(fileURL, withName: "file")
-            multipart.append("whisper-1".data(using: .utf8)!, withName: "model")
-        }, to: endpoint, headers: headers)
-        .responseDecodable(of: TranscriptionResponse.self) { response in
-            switch response.result {
-            case .success(let result):
-                completion(result.text)   // ✅ only text
-            case .failure(let error):
-                print("❌ Audio upload failed:", error.localizedDescription)
-                completion(nil)
-            }
-        }
-    }
-    
-    // MARK: - Helpers
-    private func save() {
-        do {
-            try viewContext.save()
-        } catch {
-            print("❌ Core Data save error: \(error)")
-        }
-    }
-    
+
+    // MARK: - Cancel
     func cancelGeneration() {
         currentRequest?.cancel()
         currentRequest = nil
     }
     
+    // MARK: - Regenerate
+
+    func regenerateLastMessage(completion: (() -> Void)? = nil) {
+        guard let convo = activeConversation,
+              let lastUserMsg = convo.messagesArray.last(where: { $0.isUser }) else { return }
+
+        sendMessage(
+            inputText: lastUserMsg.text,
+            fileURL: lastUserMsg.fileURL != nil ? URL(string: lastUserMsg.fileURL!) : nil,
+            fileType: lastUserMsg.fileType,
+            completion: completion
+        )
+    }
+
+
+    // MARK: - Save Helper
+    private func save() {
+        do { try viewContext.save() }
+        catch { print("❌ Core Data save error: \(error)") }
+    }
+    
+    // MARK: - OpenAI Response Structs
     nonisolated(unsafe)
     struct OpenAIChatResponse: Codable, Sendable {
         struct Choice: Codable, Sendable {
             let message: ChatMessage
         }
-
         struct ChatMessage: Codable, Sendable {
             let role: String
-
-            // For normal chat messages
             let content: String?
-
-            // For multimodal messages (with image/document parts)
             let contentParts: [ContentPart]?
-
+            
             struct ContentPart: Codable, Sendable {
-                let type: String              // "text" or "image_url"
-                let text: String?             // when type == "text"
-                let image_url: ImageURL?      // when type == "image_url"
-
-                struct ImageURL: Codable, Sendable {
-                    let url: String
-                }
+                let type: String
+                let text: String?
+                let image_url: ImageURL?
+                struct ImageURL: Codable, Sendable { let url: String }
             }
-
-            // Custom decoder for backward compatibility
+            
             init(from decoder: Decoder) throws {
                 let container = try decoder.container(keyedBy: CodingKeys.self)
                 role = try container.decode(String.self, forKey: .role)
-                // Try to decode text-only or structured array content
                 if let textContent = try? container.decode(String.self, forKey: .content) {
                     content = textContent
                     contentParts = nil
@@ -240,94 +329,14 @@ class ConversationManager: ObservableObject {
                 }
             }
         }
-
         let choices: [Choice]
     }
-
+    
     nonisolated(unsafe)
     struct TranscriptionResponse: Codable, Sendable {
         let text: String
     }
 }
-
-// MARK: - Feature-Based Conversations
-extension ConversationManager {
-    
-    func startNewConversation(for feature: CoreAIFeature, in context: NSManagedObjectContext) {
-        let convo = Conversation(context: context)
-        convo.id = UUID()
-        convo.title = ""
-        activeConversation = convo
-        save()
-    }
-
-    func addMessageToActiveConversation(_ text: String, isUser: Bool) {
-        guard let convo = activeConversation else {
-            print("⚠️ No active conversation found.")
-            return
-        }
-        let msg = Message(context: viewContext)
-        msg.id = UUID()
-        msg.text = text
-        msg.isUser = isUser
-        msg.timeStamp = Date()
-        msg.conversation = convo
-        save()
-    }
-    
-    func callFeatureAPI(systemPrompt: String, input: String, completion: @escaping () -> Void) {
-        APIHandler.shared.callFeatureAPI(systemPrompt: systemPrompt, input: input) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let output):
-                    self.addMessageToActiveConversation(output, isUser: false)
-                case .failure(let error):
-                    self.addMessageToActiveConversation("❌ Error: \(error.localizedDescription)", isUser: false)
-                }
-                completion()
-            }
-        }
-    }
-    
-    func callImageUnderstandingAPI(systemPrompt: String, input: String, fileURL: URL, completion: @escaping () -> Void) {
-        APIHandler.shared.callImageUnderstandingAPI(systemPrompt: systemPrompt, input: input, fileURL: fileURL) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let output):
-                    self.addMessageToActiveConversation(output, isUser: false,)
-                case .failure(let error):
-                    self.addMessageToActiveConversation("❌ Error: \(error.localizedDescription)", isUser: false)
-                }
-                completion()
-            }
-        }
-    }
-
-    func callDocumentUnderstandingAPI(systemPrompt: String, input: String, fileURL: URL, completion: @escaping () -> Void) {
-        APIHandler.shared.callDocumentUnderstandingAPI(systemPrompt: systemPrompt, input: input, fileURL: fileURL) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let output):
-                    self.addMessageToActiveConversation(output, isUser: false)
-                case .failure(let error):
-                    self.addMessageToActiveConversation("❌ Error: \(error.localizedDescription)", isUser: false)
-                }
-                completion()
-            }
-        }
-    }
-
-}
-
-// MARK: - Data Appending for Multipart
-extension Data {
-    mutating func append(_ string: String) {
-        if let data = string.data(using: .utf8) {
-            append(data)
-        }
-    }
-}
-
 extension Conversation {
     var messagesArray: [Message] {
         let set = messages as? Set<Message> ?? []

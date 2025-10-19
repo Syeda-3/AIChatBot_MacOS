@@ -14,6 +14,7 @@
 		A62B575E2E9B373E00711DC7 /* FeatureSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62B575D2E9B373B00711DC7 /* FeatureSidebar.swift */; };
 		A62B57602E9BC30E00711DC7 /* CoreAiFeatureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62B575F2E9BC2F700711DC7 /* CoreAiFeatureManager.swift */; };
 		A63AC10F2E9CE851005A507D /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A63AC10E2E9CE849005A507D /* SubscriptionView.swift */; };
+		A66EC7AC2EA456B000D09C4A /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A66EC7AB2EA456AE00D09C4A /* MessageBubbleView.swift */; };
 		A67C4FD82E90000200100FB6 /* FontsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FC82E90000200100FB6 /* FontsManager.swift */; };
 		A67C4FD92E90000200100FB6 /* ConversationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCA2E90000200100FB6 /* ConversationManager.swift */; };
 		A67C4FDA2E90000200100FB6 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A67C4FCB2E90000200100FB6 /* Model.xcdatamodeld */; };
@@ -46,6 +47,8 @@
 		A62B575D2E9B373B00711DC7 /* FeatureSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureSidebar.swift; sourceTree = "<group>"; };
 		A62B575F2E9BC2F700711DC7 /* CoreAiFeatureManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAiFeatureManager.swift; sourceTree = "<group>"; };
 		A63AC10E2E9CE849005A507D /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
+		A66EC7AB2EA456AE00D09C4A /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
+		A66EC7AD2EA49FD300D09C4A /* AiChatBot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AiChatBot.entitlements; sourceTree = "<group>"; };
 		A67C4F8D2E8FFF1F00100FB6 /* AiChatBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AiChatBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A67C4FC12E90000200100FB6 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
 		A67C4FC22E90000200100FB6 /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
@@ -94,6 +97,7 @@
 		A67C4F842E8FFF1F00100FB6 = {
 			isa = PBXGroup;
 			children = (
+				A66EC7AD2EA49FD300D09C4A /* AiChatBot.entitlements */,
 				A62516B12EA1B466001070D6 /* StoreKitTesting.storekit */,
 				A67C4FD52E90000200100FB6 /* AiChatBot */,
 				A67C4F8E2E8FFF1F00100FB6 /* Products */,
@@ -137,12 +141,12 @@
 		A67C4FD02E90000200100FB6 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A67C4FCE2E90000200100FB6 /* ChatWithAIView.swift */,
 				A63AC10E2E9CE849005A507D /* SubscriptionView.swift */,
 				A62B575D2E9B373B00711DC7 /* FeatureSidebar.swift */,
 				A6243A552E9AAB6E009AA0C2 /* ModelView.swift */,
 				A6A8912E2E90455200A6725A /* CoreAiView.swift */,
 				A6A8912A2E90437F00A6725A /* MainContainer.swift */,
-				A67C4FCE2E90000200100FB6 /* ChatWithAIView.swift */,
 				A67C4FCF2E90000200100FB6 /* SideMenuView.swift */,
 			);
 			path = Views;
@@ -169,6 +173,7 @@
 		A6AE5BCE2E906212005DEBA5 /* CustomCellViews */ = {
 			isa = PBXGroup;
 			children = (
+				A66EC7AB2EA456AE00D09C4A /* MessageBubbleView.swift */,
 				A6AE5BD02E90626C005DEBA5 /* FeatureCellView.swift */,
 				A6AE5BCD2E906212005DEBA5 /* ConversationCellView.swift */,
 			);
@@ -265,6 +270,7 @@
 				A62B57602E9BC30E00711DC7 /* CoreAiFeatureManager.swift in Sources */,
 				A6AE5BCF2E906212005DEBA5 /* ConversationCellView.swift in Sources */,
 				A67C4FDA2E90000200100FB6 /* Model.xcdatamodeld in Sources */,
+				A66EC7AC2EA456B000D09C4A /* MessageBubbleView.swift in Sources */,
 				A67C4FDB2E90000200100FB6 /* PersistenceController.swift in Sources */,
 				A62B575E2E9B373E00711DC7 /* FeatureSidebar.swift in Sources */,
 				A67C4FDC2E90000200100FB6 /* ChatWithAIView.swift in Sources */,
@@ -426,11 +432,12 @@
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
-				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = YES;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AiChatBot/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs microphone for recording audio.";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -483,6 +490,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AiChatBot/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs microphone for recording audio.";
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -1,0 +1,95 @@
+//
+//  Untitled.swift
+//  AiChatBot
+//
+//  Created by Simra Syed on 19/10/2025.
+//
+
+import SwiftUI
+
+struct MessageBubbleView: View {
+    let message: Message
+    let isActive: Bool
+    
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 8) {
+            if message.isUser {
+                Spacer()
+                bubbleContent
+                    .background(Color.clear)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+            } else {
+                ZStack(alignment: .bottomTrailing) {
+                    bubbleContent
+                        .background(Color.black)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                    
+                    // Copy icon outside bottom-right
+                    if let text = message.text, !text.isEmpty {
+                        Button(action: {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(text, forType: .string)
+                        }) {
+                            Image(systemName: "doc.on.doc")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.85))
+                                .padding(5)
+                                .background(Color.clear)
+                                .offset(x: 15, y: 17)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Copy message text")
+                    }
+                }
+                Spacer()
+            }
+        }
+        .opacity(isActive ? 1 : 0.6)
+        .padding(.horizontal)
+        .transition(.opacity.combined(with: .move(edge: .bottom)))
+    }
+    
+    @ViewBuilder
+    private var bubbleContent: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if let filePath = message.fileURL {
+                let url = URL(fileURLWithPath: filePath)
+                
+                if message.fileType == "image" {
+                    if let data = message.fileData,
+                       let image = NSImage(data: data) {
+                        Image(nsImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: 180, maxHeight: 180)
+                            .cornerRadius(12)
+                            .shadow(radius: 4)
+                    }
+                } else {
+                    VStack(spacing: 8) {
+                        Image(systemName: "doc.text")
+                            .font(.system(size: 36))
+                            .foregroundColor(.gray)
+                        Text(url.lastPathComponent)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                    .padding()
+                    .frame(width: 180, height: 180)
+                    .background(Color.gray.opacity(0.15))
+                    .cornerRadius(12)
+                }
+            }
+            
+            if let text = message.text, !text.isEmpty {
+                Text(text)
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(10)
+    }
+}
