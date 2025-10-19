@@ -10,7 +10,7 @@ import SwiftUI
 struct MessageBubbleView: View {
     let message: Message
     let isActive: Bool
-    
+
     var body: some View {
         HStack(alignment: .bottom, spacing: 8) {
             if message.isUser {
@@ -19,44 +19,51 @@ struct MessageBubbleView: View {
                     .background(Color.clear)
                     .foregroundColor(.white)
                     .cornerRadius(12)
-            } else {
+            }
+            else {
                 ZStack(alignment: .bottomTrailing) {
-                    bubbleContent
-                        .background(Color.black)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                    
-                    // Copy icon outside bottom-right
-                    if let text = message.text, !text.isEmpty {
-                        Button(action: {
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(text, forType: .string)
-                        }) {
-                            Image(systemName: "doc.on.doc")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.85))
-                                .padding(5)
-                                .background(Color.clear)
-                                .offset(x: 15, y: 17)
+                    VStack(alignment: .trailing, spacing:1) {
+                        // Message text
+                        if let text = message.text, !text.isEmpty {
+                            Text(text)
+                                .font(.system(size: 15))
+                                .padding(10)
+                                .background(Color.black)
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
                         }
-                        .buttonStyle(.plain)
-                        .help("Copy message text")
+
+                        // Copy button BELOW message
+                        if let text = message.text, !text.isEmpty {
+                            Button(action: {
+                                let pb = NSPasteboard.general
+                                pb.clearContents()
+                                pb.setString(text, forType: .string)
+                            }) {
+                                Image(systemName: "doc.on.doc")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .padding(6)
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.trailing,0)
+                        }
                     }
                 }
-                Spacer()
             }
         }
         .opacity(isActive ? 1 : 0.6)
         .padding(.horizontal)
         .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
-    
+
     @ViewBuilder
     private var bubbleContent: some View {
         VStack(alignment: .leading, spacing: 6) {
             if let filePath = message.fileURL {
                 let url = URL(fileURLWithPath: filePath)
-                
+
                 if message.fileType == "image" {
                     if let data = message.fileData,
                        let image = NSImage(data: data) {
@@ -83,7 +90,7 @@ struct MessageBubbleView: View {
                     .cornerRadius(12)
                 }
             }
-            
+
             if let text = message.text, !text.isEmpty {
                 Text(text)
                     .font(.body)

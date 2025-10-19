@@ -11,20 +11,20 @@ import UniformTypeIdentifiers
 import AppKit
 
 struct CoreAIView: View {
-//    
-//    @State private var inputText: String = ""
-//    @State private var editorHeight: CGFloat = 145
-//    @State private var isGenerating = false
-//    @State private var selectedFeature: CoreAIFeature? = .summarization
-//    @State private var selectedSubFeature: SubFeature? = nil
-//    
-//    @EnvironmentObject var convoManager: ConversationManager
-//    @Environment(\.managedObjectContext) private var viewContext
-//    
-//    @State private var showSubscription = false
-//    @State private var selectedFile: URL?
-//    @State private var imagePreview: NSImage?
-//    
+    
+    @State private var inputText: String = ""
+    @State private var editorHeight: CGFloat = 145
+    @State private var isGenerating = false
+    @State private var selectedFeature: CoreAIFeature? = .summarization
+    @State private var selectedSubFeature: SubFeature? = nil
+    
+    @EnvironmentObject var convoManager: ConversationManager
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @State private var showSubscription = false
+    @State private var selectedFile: URL?
+    @State private var imagePreview: NSImage?
+    
     var body: some View {
 //        ZStack {
 //            Color.black.ignoresSafeArea()
