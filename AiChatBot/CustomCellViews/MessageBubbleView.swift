@@ -10,14 +10,14 @@ import SwiftUI
 struct MessageBubbleView: View {
     let message: Message
     let isActive: Bool
-
+    
     var body: some View {
         HStack(alignment: .bottom, spacing: 8) {
             if message.isUser {
                 Spacer()
                 bubbleContent
                     .background(Color.clear)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color("TextColor"))
                     .cornerRadius(12)
             }
             else {
@@ -28,11 +28,11 @@ struct MessageBubbleView: View {
                             Text(text)
                                 .font(.system(size: 15))
                                 .padding(10)
-                                .background(Color.black)
-                                .foregroundColor(.white)
+                                .background(Color("mainBG"))
+                                .foregroundColor(Color("TextColor"))
                                 .cornerRadius(12)
                         }
-
+                        
                         // Copy button BELOW message
                         if let text = message.text, !text.isEmpty {
                             Button(action: {
@@ -42,7 +42,7 @@ struct MessageBubbleView: View {
                             }) {
                                 Image(systemName: "doc.on.doc")
                                     .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(.white.opacity(0.9))
+                                    .foregroundColor(Color("TextColor"))
                                     .padding(6)
                                     .clipShape(Circle())
                             }
@@ -57,13 +57,13 @@ struct MessageBubbleView: View {
         .padding(.horizontal)
         .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
-
+    
     @ViewBuilder
     private var bubbleContent: some View {
         VStack(alignment: .leading, spacing: 6) {
             if let filePath = message.fileURL {
                 let url = URL(fileURLWithPath: filePath)
-
+                
                 if message.fileType == "image" {
                     if let data = message.fileData,
                        let image = NSImage(data: data) {
@@ -81,7 +81,7 @@ struct MessageBubbleView: View {
                             .foregroundColor(.gray)
                         Text(url.lastPathComponent)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color("TextColor"))
                             .lineLimit(1)
                     }
                     .padding()
@@ -90,10 +90,11 @@ struct MessageBubbleView: View {
                     .cornerRadius(12)
                 }
             }
-
+            
             if let text = message.text, !text.isEmpty {
                 Text(text)
                     .font(.body)
+                    .foregroundColor(Color("TextColor"))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

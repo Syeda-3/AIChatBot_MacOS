@@ -18,7 +18,7 @@ struct FeatureSidebar: View {
         VStack(spacing: 0) {
             Text("Features")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(Color("TextColor"))
                 .padding()
             
             ScrollView {
@@ -27,11 +27,12 @@ struct FeatureSidebar: View {
                         VStack(alignment: .leading, spacing: 6) {
                             FeatureCellView(
                                 isSelected: selectedFeature == feature,
-                                title: feature.rawValue.capitalized
+                                title: feature.title.capitalized
                             ) {
                                 withAnimation(.easeInOut) {
                                     if selectedFeature == feature {
-                                    } else {
+                                    }
+                                    else {
                                         selectedFeature = feature
                                         selectedSubFeature = nil
                                         convoManager.resetConversation()

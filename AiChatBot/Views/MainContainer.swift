@@ -23,8 +23,8 @@ struct MainContainer: View {
                 ChatWithAIView()
             case .aiTools:
                 CoreAIView()
-            case .settings:
-                ChatWithAIView()
+//            case .settings:
+//                ChatWithAIView()
             case .none:
                 Text("Select a menu")
                     .foregroundColor(.gray)

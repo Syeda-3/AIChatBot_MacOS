@@ -23,7 +23,7 @@ struct ConversationCellView: View {
             if isRenaming {
                 TextField("Rename", text: $tempTitle)
                     .focused($focusField)
-                    .foregroundColor(.white)
+                    .foregroundColor(isSelected ? Color.white :  Color("TextColor"))
                     .padding(.leading, 12)
                     .padding(.vertical, 8)
                     .onAppear {
@@ -38,9 +38,10 @@ struct ConversationCellView: View {
                         focusField = false
                         onRenameStart(nil)
                     }
-            } else {
+            }
+            else {
                 Text(convo.title ?? "Untitled")
-                    .foregroundColor(.white)
+                    .foregroundColor(isSelected ? Color.white :  Color("TextColor"))
                     .lineLimit(1)
                     .padding(.leading, 12)
                     .padding(.vertical, 8)
@@ -57,6 +58,7 @@ struct ConversationCellView: View {
             }
             .frame(width: 15)
             .menuStyle(.borderlessButton)
+            .colorScheme(.dark)
         }
         .background(
             (isSelected ? Color.black : Color("BgColor"))

@@ -9,8 +9,6 @@ import SwiftUI
 import StoreKit
 import Combine
 
-import StoreKit
-
 @MainActor
 class SubscriptionManager: ObservableObject {
     static let shared = SubscriptionManager()
@@ -23,6 +21,12 @@ class SubscriptionManager: ObservableObject {
         // Start listening immediately when the app launches
         listenForTransactions()
     }
+    
+    var isSubscribed: Bool {
+        // If user has any active plan (weekly/monthly/yearly/lifetime)
+        !purchasedSubscriptions.isEmpty || currentPlan != nil
+    }
+
 
     // MARK: - Listen for transaction updates
     private func listenForTransactions() {

@@ -16,7 +16,7 @@ struct FeatureCellView: View {
     var body: some View {
         HStack {
                 Text(title)
-                    .foregroundColor(.white)
+                .foregroundColor(isSelected ? Color.white :  Color("TextColor"))
                     .lineLimit(1)
                     .padding(.leading, 12)
                     .padding(.vertical, 8)

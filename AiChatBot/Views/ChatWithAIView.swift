@@ -21,7 +21,8 @@ struct ChatWithAIView: View {
     @State private var tempTitle: String = ""
     @StateObject private var recorder = AudioRecorder()
     @State private var showWaveform = false
-    
+    @State private var showSubscription: Bool = false
+
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Conversation.createdAt, ascending: true)],
         animation: .default
@@ -38,37 +39,41 @@ struct ChatWithAIView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            Color("mainBG").ignoresSafeArea()
             
             HStack(spacing: 0) {
                 
                 if convoManager.activeConversation == nil {
                     // Welcome screen
                     VStack {
-                        Spacer()
-                        
-                        Image("greencircle")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 80, height: 80)
-                            .clipShape(Circle())
-                            .shadow(radius: 5)
-                        
-                        Text("Ask anything, anytime — your AI is here to help")
-                            .font(.title2)
-                            .padding(.top, 12)
-                        messageBox
-//                            .frame(height: editorHeight)
-                            .padding(.horizontal, 60)
-//                            .onChange(of: inputText) { _ in
-//                                recalcHeight()
-//                            }
-                        
-                        Spacer()
+                        HStack {
+                            Spacer()
+                            ModelSelectorView()
+                                .frame(width: 200)
+                                .padding(.trailing, 16)
+                                .padding(.top,8)
+                        }
+                        VStack {
+                            Spacer()
+                            
+                            Image("greencircle")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 80, height: 80)
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
+                            
+                            Text("Ask anything, anytime — your AI is here to help")
+                                .font(.title2)
+                                .padding(.top, 20)
+                            messageBox
+                                .padding(.horizontal, 60)
+                            Spacer()
+                        }
+                        .background(Color("BgColor"))
+                        .cornerRadius(12)
+                        .padding()
                     }
-                    .background(Color("BgColor"))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
                 }
                 else {
                     Spacer()
@@ -78,7 +83,7 @@ struct ChatWithAIView: View {
                         VStack(spacing: 0) {
                             Text("Chat History")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(Color("TextColor"))
                                 .padding()
                             
                             Spacer()
@@ -106,7 +111,7 @@ struct ChatWithAIView: View {
                             // Clear all button
                             Button(action: deleteAllConversations) {
                                 Text("Clear all chats")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color("TextColor"))
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
                             }
@@ -114,7 +119,7 @@ struct ChatWithAIView: View {
                             
                             Button(action: addNewChat) {
                                 Image(systemName: "plus")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color("TextColor"))
                             }
                             .buttonStyle(.plain)
                             .padding(.vertical, 12)
@@ -160,21 +165,27 @@ struct ChatWithAIView: View {
                             // Buttons row
                             HStack(spacing: 12) {
                                 if isGenerating {
-                                    Button(action: {
-                                        convoManager.cancelGeneration()
-                                        isGenerating = false
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "stop.circle")
-                                            Text("Stop Generating")
+                                    VStack(spacing: 6) {
+                                        ProgressView()
+                                            .scaleEffect(0.8)
+                                            .tint(.white)
+
+                                        Button(action: {
+                                            convoManager.cancelGeneration()
+                                            isGenerating = false
+                                        }) {
+                                            HStack {
+                                                Image(systemName: "stop.circle")
+                                                Text("Stop Generating")
+                                            }
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 6)
+                                            .foregroundColor(.red)
+                                            .background(Color("mainBG"))
+                                            .cornerRadius(8)
                                         }
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 6)
-                                        .foregroundColor(.red)
-                                        .background(Color.black)
-                                        .cornerRadius(8)
+                                        .buttonStyle(.plain)
                                     }
-                                    .buttonStyle(.plain)
                                 }
                                 else if convoManager.activeConversation != nil {
                                     Button(action: {
@@ -197,7 +208,7 @@ struct ChatWithAIView: View {
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 6)
                                         .foregroundColor(.green)
-                                        .background(Color.black)
+                                        .background(Color("mainBG"))
                                         .cornerRadius(8)
                                     }
                                     .buttonStyle(.plain)
@@ -207,13 +218,11 @@ struct ChatWithAIView: View {
                             
                             // Message box
                             messageBox
-//                                .frame(height: editorHeight)
                                 .padding(10)
-//                                .onChange(of: inputText) { _ in recalcHeight() }
                         }
                         .background(Color("BgColor"))
                         .cornerRadius(12)
-                        .padding(.vertical)
+                        .padding(.bottom, 8)
                         .padding(.horizontal)
                     }
                 }
@@ -223,6 +232,9 @@ struct ChatWithAIView: View {
             if convoManager.activeConversation == nil {
                 convoManager.activeConversation = conversations.last
             }
+        }
+        .sheet(isPresented: $convoManager.showSubscription) {
+            SubscriptionView()
         }
     }
 
@@ -249,7 +261,7 @@ struct ChatWithAIView: View {
 
                             Text(file.lastPathComponent)
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color("TextColor"))
                                 .lineLimit(1)
                         }
                         .padding()
@@ -273,62 +285,14 @@ struct ChatWithAIView: View {
                 .transition(.opacity)
             }
             
-            //            if showWaveform {
-            //                // 🎤 Recording state
-            //                VStack {
-            //                    WaveformView(levels: recorder.levels)
-            //                        .frame(height: 30)
-            //                        .padding(.top, 15)
-            //
-            //                    HStack {
-            //                        Button(action: {
-            //                            recorder.stop()
-            //                            showWaveform = false
-            //                        }) {
-            //                            Image(systemName: "xmark")
-            //                                .font(.system(size: 20, weight: .bold))
-            //                                .foregroundColor(.red)
-            //                        }
-            //                        .buttonStyle(.plain)
-            //
-            //                        Spacer()
-            //
-            //                        Button(action: {
-            //                            recorder.stop()
-            //                            showWaveform = false
-            //
-            //                            if let url = recorder.lastRecordingURL {
-            //                                convoManager.sendAudio(fileURL: url) { text in
-            //                                    if let text = text {
-            //                                        print(text)
-            //                                        self.inputText = text
-            //                                        self.sendMessage()
-            //                                    }
-            //                                    else {
-            //                                        self.inputText = "[transcription failed]"
-            //                                    }
-            //                                }
-            //                            }
-            //                        }
-            //                        ) {
-            //                            Image(systemName: "checkmark")
-            //                                .font(.system(size: 20, weight: .bold))
-            //                                .foregroundColor(.green)
-            //                        }
-            //                        .buttonStyle(.plain)
-            //                    }
-            //                }
-            //            }
-            //            else {
-            
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $inputText)
                     .scrollContentBackground(.hidden)
                     .padding(.vertical, 8)
                     .frame(minHeight: 40, maxHeight: 120, alignment: .center)
                     .background(Color.clear)
-                    .foregroundColor(.white)
-                
+                    .foregroundColor(Color("TextColor"))
+
                 if inputText.isEmpty {
                     Text("Write your message ...")
                         .foregroundColor(.gray)
@@ -336,8 +300,6 @@ struct ChatWithAIView: View {
                         .padding(.vertical, 8)
                 }
             }
-            //            }
-            
             // Bottom row of buttons
             HStack(spacing: 16) {
                 Button(action: {
@@ -348,32 +310,7 @@ struct ChatWithAIView: View {
                 .buttonStyle(.plain)
                 
                 Spacer()
-                
-                //                Button(action: {}) {
-                //                    Image("image").foregroundColor(.gray)
-                //                }
-                //                .buttonStyle(.plain)
-                
-                //                Button(action: {
-                //                    if recorder.isRecording {
-                //                        recorder.stop()
-                //                        showWaveform = false
-                //                    }
-                //                    else {
-                //                        recorder.requestAndStart()
-                //                        showWaveform = true
-                //                    }
-                //                }) {
-                //                    Image("voice")
-                //                        .foregroundColor(showWaveform ? .red : .gray)
-                //                }
-                //                .buttonStyle(.plain)
-                
-                
-                //                Divider()
-                //                    .frame(height: 20)
-                //                    .background(Color.white)
-                
+                            
                 Button(action: {sendMessage()}) {
                     Image("sent")
                         .foregroundColor(.white)
@@ -384,7 +321,7 @@ struct ChatWithAIView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(Color.black)
+        .background(Color("mainBG"))
         .cornerRadius(16)
     }
     
@@ -436,7 +373,9 @@ struct ChatWithAIView: View {
     private func deleteConversation(_ convo: Conversation) {
         viewContext.delete(convo)
         saveContext()
-        if convoManager.activeConversation == convo { convoManager.activeConversation = nil }
+        if conversations.isEmpty {
+            convoManager.activeConversation = nil
+        }
     }
     
     private func deleteAllConversations() {

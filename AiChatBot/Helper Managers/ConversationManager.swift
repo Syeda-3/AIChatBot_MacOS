@@ -343,3 +343,214 @@ extension Conversation {
         return set.sorted { $0.timeStamp ?? Date() < $1.timeStamp ?? Date() }
     }
 }
+// MARK: - Core Feature APIs
+extension ConversationManager {
+    
+    func callFeatureAPI(
+        systemPrompt: String,
+        input: String,
+        completion: (() -> Void)? = nil) {
+            
+            
+            var convo: Conversation
+            if let existing = activeConversation {
+                convo = existing
+            } else {
+                convo = createConversation(title: input.isEmpty ? "" : input)
+                activeConversation = convo
+            }
+            
+            guard handleSubscriptionLimit() else {
+                completion?()
+                return
+            }
+            
+            let url = "\(baseURL)/chat/completions"
+            let parameters: [String: Any] = [
+                "model": "gpt-5-mini",
+                "messages": [
+                    ["role": "system", "content": systemPrompt],
+                    ["role": "user", "content": input]
+                ]
+            ]
+            
+            let headers: HTTPHeaders = [
+                "Authorization": "Bearer \(apiKey)",
+                "Content-Type": "application/json"
+            ]
+            
+            currentRequest?.cancel()
+            currentRequest = AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+                .validate()
+                .responseDecodable(of: OpenAIChatResponse.self) { response in
+                    defer { DispatchQueue.main.async { completion?() } }
+                    
+                    switch response.result {
+                    case .success(let result):
+                        if let reply = result.choices.first?.message.content {
+                            DispatchQueue.main.async {
+                                self.addMessage(to: convo, text: input, isUser: true)
+                                self.addMessage(to: convo, text: reply, isUser: false)
+                                self.fetchAllConversations()
+                            }
+                        }
+                    case .failure(let error):
+                        print("❌ Feature API error:", error.localizedDescription)
+                    }
+                }
+        }
+    
+    func callImageUnderstandingAPI(
+        systemPrompt: String,
+        input: String,
+        fileURL: URL,
+        completion: (() -> Void)? = nil
+    ) {
+        var convo: Conversation
+        if let existing = activeConversation {
+            convo = existing
+        } else {
+            convo = createConversation(title: input.isEmpty ? "Image understanding" : input)
+            activeConversation = convo
+        }
+        
+        guard let imageData = try? Data(contentsOf: fileURL) else { completion?(); return }
+        guard handleSubscriptionLimit() else {
+            completion?()
+            return
+        }
+        
+        
+        let base64 = imageData.base64EncodedString()
+        let url = "\(baseURL)/chat/completions"
+        
+        
+        let parameters: [String: Any] = [
+            "model": "gpt-5-mini",
+            "messages": [
+                ["role": "system", "content": systemPrompt],
+                ["role": "user", "content": [
+                    ["type": "text", "text": input],
+                    ["type": "image_url", "image_url": ["url": "data:image/png;base64,\(base64)"]]
+                ]]
+            ]
+        ]
+        
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(apiKey)",
+            "Content-Type": "application/json"
+        ]
+        
+        currentRequest?.cancel()
+        currentRequest = AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+            .validate()
+            .responseDecodable(of: OpenAIChatResponse.self) { response in
+                defer { DispatchQueue.main.async { completion?() } }
+                
+                switch response.result {
+                case .success(let result):
+                    if let reply = result.choices.first?.message.content {
+                        DispatchQueue.main.async {
+                            // MARK: - Save user message properly
+                            let userMsg = self.addMessage(
+                                to: convo,
+                                text: input,
+                                isUser: true,
+                                fileURL: fileURL,
+                                fileType: "image"
+                            )
+                            
+                                    if let image = NSImage(contentsOf: fileURL),
+                                       let tiff = image.tiffRepresentation,
+                                       let bitmap = NSBitmapImageRep(data: tiff),
+                                       let jpegData = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.6]) {
+                                        userMsg.fileData = jpegData
+                                    }
+                                self.save()
+
+                            self.addMessage(to: convo, text: input, isUser: true, fileURL: fileURL, fileType: "image")
+                            self.addMessage(to: convo, text: reply, isUser: false)
+                            self.fetchAllConversations()
+                        }
+                    }
+                case .failure(let error):
+                    print("❌ Image Understanding API error:", error.localizedDescription)
+                }
+            }
+    }
+    
+    func callDocumentUnderstandingAPI(
+        systemPrompt: String,
+        input: String,
+        fileURL: URL,
+        completion: (() -> Void)? = nil
+    ) {
+        var convo: Conversation
+        if let existing = activeConversation {
+            convo = existing
+        }
+        else {
+            convo = createConversation(title: input.isEmpty ? "Document understanding" : input)
+            activeConversation = convo
+        }
+
+        guard handleSubscriptionLimit() else {
+            completion?()
+            return
+        }
+        
+        let url = "\(baseURL)/chat/completions"
+        let parameters: [String: Any] = [
+            "model": "gpt-5-mini",
+            "messages": [
+                ["role": "system", "content": systemPrompt],
+                ["role": "user", "content": "\(input)\n\n[Document attached: \(fileURL.lastPathComponent)]"]
+            ]
+        ]
+        
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(apiKey)",
+            "Content-Type": "application/json"
+        ]
+        
+        currentRequest?.cancel()
+        currentRequest = AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+            .validate()
+            .responseDecodable(of: OpenAIChatResponse.self) { response in
+                defer { DispatchQueue.main.async { completion?() } }
+                
+                switch response.result {
+                case .success(let result):
+                    if let reply = result.choices.first?.message.content {
+                        DispatchQueue.main.async {
+                            self.addMessage(to: convo, text: input, isUser: true, fileURL: fileURL, fileType: "document")
+                            self.addMessage(to: convo, text: reply, isUser: false)
+                            self.fetchAllConversations()
+                        }
+                    }
+                case .failure(let error):
+                    print("❌ Document Understanding API error:", error.localizedDescription)
+                }
+            }
+    }
+}
+extension ConversationManager {
+
+    func ensureActiveConversation(for feature: CoreAIFeature, text: String, in context: NSManagedObjectContext) -> Conversation {
+        if let convo = activeConversation {
+            return convo
+        } else {
+            let newConvo = createConversation(title: text.isEmpty ? feature.title : text)
+            activeConversation = newConvo
+            return newConvo
+        }
+    }
+
+    func addMessageToActiveConversation(_ text: String, isUser: Bool) {
+        guard let convo = activeConversation else {
+            print("⚠️ Tried to add message but no active conversation.")
+            return
+        }
+        addMessage(to: convo, text: text, isUser: isUser)
+    }
+}
