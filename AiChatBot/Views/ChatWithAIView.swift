@@ -22,11 +22,13 @@ struct ChatWithAIView: View {
     @StateObject private var recorder = AudioRecorder()
     @State private var showWaveform = false
     @State private var showSubscription: Bool = false
+    @State private var lastShiftPressed = false
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Conversation.createdAt, ascending: true)],
         animation: .default
     )
+    
     private var conversations: FetchedResults<Conversation>
     
     @State private var inputText: String = ""
@@ -36,6 +38,8 @@ struct ChatWithAIView: View {
     @State private var selectedFile: URL?
     @State private var imagePreview: NSImage?
     @State private var selectedFileType: String? = nil
+    @State private var isShiftPressed = false
+    @FocusState private var focusEditor: Bool
 
     var body: some View {
         ZStack {
@@ -152,15 +156,16 @@ struct ChatWithAIView: View {
                                             .id(msg.id)
                                         }
                                     }
-//                                    .padding(.vertical)
-                                }
-                                .onChange(of: convoManager.activeConversation?.messagesArray.count) { _ in
-                                    scrollToBottom(proxy)
+                                    .id(convoManager.messagesVersion)
                                 }
                                 .onAppear {
                                     scrollToBottom(proxy)
                                 }
+                                .onChange(of: convoManager.messagesVersion) {
+                                    scrollToBottom(proxy)
+                                }
                             }
+
                                                     
                             // Buttons row
                             HStack(spacing: 12) {
@@ -197,7 +202,9 @@ struct ChatWithAIView: View {
                                             inputText: lastUserMsg.text,
                                             regenerateFor: lastUserMsg
                                         ) {
-                                            DispatchQueue.main.async { isGenerating = false }
+                                            DispatchQueue.main.async {
+                                                isGenerating = false
+                                            }
                                         }
                                     }
                                     ) {
@@ -253,7 +260,7 @@ struct ChatWithAIView: View {
                             .shadow(radius: 4)
                     }
                     else {
-                        VStack( spacing: 8) {
+                        VStack(spacing: 8) {
                             Image(systemName: "doc.text")
                                 .resizable()
                                 .foregroundColor(.gray)
@@ -289,9 +296,13 @@ struct ChatWithAIView: View {
                 TextEditor(text: $inputText)
                     .scrollContentBackground(.hidden)
                     .padding(.vertical, 8)
-                    .frame(minHeight: 40, maxHeight: 120, alignment: .center)
+                    .frame(minHeight: 40, maxHeight: 120)
                     .background(Color.clear)
                     .foregroundColor(Color("TextColor"))
+                    .onChange(of: inputText) { newValue in
+                        handleTextChange(newValue)
+                    }
+                    .focused($focusEditor) // focus here
 
                 if inputText.isEmpty {
                     Text("Write your message ...")
@@ -300,18 +311,22 @@ struct ChatWithAIView: View {
                         .padding(.vertical, 8)
                 }
             }
-            // Bottom row of buttons
+            .contentShape(Rectangle()) 
+            .onTapGesture {
+                focusEditor = true // focuses the TextEditor when tapped
+            }
+            .background(KeyboardMonitor(isShiftPressed: $isShiftPressed))
+
+            // MARK: - Bottom buttons
             HStack(spacing: 16) {
-                Button(action: {
-                    openFilePicker()
-                }) {
+                Button(action: openFilePicker) {
                     Image("link").foregroundColor(.gray)
                 }
                 .buttonStyle(.plain)
-                
+
                 Spacer()
-                            
-                Button(action: {sendMessage()}) {
+
+                Button(action: sendMessage) {
                     Image("sent")
                         .foregroundColor(.white)
                         .font(.system(size: 18))
@@ -324,33 +339,26 @@ struct ChatWithAIView: View {
         .background(Color("mainBG"))
         .cornerRadius(16)
     }
-    
-    
+
     // MARK: - Functions
     
     private func sendMessage() {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
 
-        // Create a conversation if none exists yet
         if convoManager.activeConversation == nil {
             convoManager.activeConversation = convoManager.createConversation(title: text)
         }
 
         isGenerating = true
-
-        // Send message (with or without file)
         convoManager.sendMessage(
             inputText: text,
             fileURL: selectedFile,
-            fileType: selectedFileType
-        ) {
+            fileType: selectedFileType) {
             DispatchQueue.main.async {
                 isGenerating = false
             }
         }
-
-        // Reset after sending
         resetMessageBox()
     }
 
@@ -389,12 +397,6 @@ struct ChatWithAIView: View {
         newTitle = convo.title ?? ""
     }
     
-    private func recalcHeight() {
-        let lineCount = max(1, inputText.split(separator: "\n").count)
-        let newHeight = CGFloat(30 * lineCount + 100)
-        editorHeight = min(max(145, newHeight), 400)
-    }
-    
     private func resetMessageBox() {
         inputText = ""
         selectedFile = nil
@@ -402,6 +404,17 @@ struct ChatWithAIView: View {
         selectedFileType = nil
     }
     
+    private func handleTextChange(_ newValue: String) {
+        guard newValue.hasSuffix("\n") else { return }
+
+        if isShiftPressed {
+            return  // allow newline
+        } else {
+            inputText = newValue.trimmingCharacters(in: .newlines)
+            sendMessage()
+        }
+    }
+
     private func openFilePicker() {
         
         let panel = NSOpenPanel()
@@ -447,4 +460,29 @@ struct ChatWithAIView: View {
             imagePreview = nil
         }
     }
+}
+
+struct KeyboardMonitor: NSViewRepresentable {
+    @Binding var isShiftPressed: Bool
+
+    class KeyView: NSView {
+        @Binding var isShiftPressed: Bool
+        init(isShiftPressed: Binding<Bool>) {
+            _isShiftPressed = isShiftPressed
+            super.init(frame: .zero)
+        }
+        required init?(coder: NSCoder) { fatalError() }
+
+        override var acceptsFirstResponder: Bool { true }
+
+        override func flagsChanged(with event: NSEvent) {
+            isShiftPressed = event.modifierFlags.contains(.shift)
+        }
+    }
+
+    func makeNSView(context: Context) -> NSView {
+        KeyView(isShiftPressed: $isShiftPressed)
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
 }

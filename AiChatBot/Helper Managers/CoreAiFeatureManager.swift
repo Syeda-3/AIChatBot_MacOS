@@ -11,10 +11,9 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
     case summarization
     case paraphrasing
     case grammar
-    case translation
     case contentGen
     case codeAssist
-    case language
+    case translation
     case imageUnderstanding
     case documentUnderstanding
 
@@ -26,12 +25,11 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
         case .summarization: return "Summarization"
         case .paraphrasing: return "Paraphrasing"
         case .grammar: return "Grammar Check"
-        case .translation: return "Translation"
         case .contentGen: return "Content Generation"
         case .codeAssist: return "Code Assistant"
         case .imageUnderstanding: return "Image Understanding"
         case .documentUnderstanding: return "Document Understanding"
-        case .language: return "Language"
+        case .translation: return "Translation"
         }
     }
 
@@ -43,8 +41,6 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
             return "Reword content while keeping the meaning intact."
         case .grammar:
             return "Fix spelling, grammar, and tone for clarity."
-        case .translation:
-            return "Translate text between multiple languages accurately."
         case .contentGen:
             return "Create blog posts, product descriptions, or social content."
         case .codeAssist:
@@ -53,8 +49,8 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
             return "Analyze and describe image content."
         case .documentUnderstanding:
             return "Extract insights or summaries from complex documents."
-        case .language:
-            return "Translate text into specific target languages with full accuracy."
+        case .translation:
+            return "Translate text between multiple languages accurately."
         }
     }
 
@@ -67,8 +63,6 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
             return "Rewrite the following text in a clear and engaging way."
         case .grammar:
             return "Correct grammar and improve writing style."
-        case .translation:
-            return "Translate this text into English."
         case .contentGen:
             return "Generate creative marketing content."
         case .codeAssist:
@@ -77,7 +71,7 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
             return "Describe what’s happening in the image."
         case .documentUnderstanding:
             return "Extract key insights from the provided document."
-        case .language:
+        case .translation:
             return "Translate the following text accurately into the selected language."
         }
     }
@@ -186,7 +180,7 @@ enum CoreAIFeature: String, CaseIterable, Identifiable {
                     )
                 ]
             
-        case .language:
+        case .translation:
             return LanguageLoader.loadLanguages()
 
         default:

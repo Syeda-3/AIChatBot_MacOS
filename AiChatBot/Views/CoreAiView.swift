@@ -25,6 +25,8 @@ struct CoreAIView: View {
     @State private var imagePreview: NSImage?
     @State private var systemPrompt: String = ""
     @State private var showSubscription: Bool = false
+    @State private var isShiftPressed = false
+    @FocusState private var focusEditor: Bool
 
     var body: some View {
         ZStack {
@@ -96,12 +98,12 @@ struct CoreAIView: View {
                                             .id(msg.id)
                                         }
                                     }
-//                                    .padding(.vertical)
-                                }
-                                .onChange(of: convoManager.activeConversation?.messagesArray.count) { _ in
-                                    scrollToBottom(proxy)
+                                    .id(convoManager.messagesVersion)
                                 }
                                 .onAppear {
+                                    scrollToBottom(proxy)
+                                }
+                                .onChange(of: convoManager.messagesVersion) {
                                     scrollToBottom(proxy)
                                 }
                             }
@@ -135,13 +137,18 @@ struct CoreAIView: View {
                                 }
                                 else if convoManager.activeConversation != nil {
                                     Button(action: {
-                                        if let lastUserMsg = convoManager.activeConversation?.messagesArray.last(where: { $0.isUser })?.text {
+                                        if let lastUserMsg = convoManager.activeConversation?.messagesArray.last(where: { $0.isUser }) {
                                             isGenerating = true
-                                            convoManager.callFeatureAPI(systemPrompt: systemPrompt, input: lastUserMsg) {
+                                            convoManager.callFeatureAPI(
+                                                systemPrompt: systemPrompt,
+                                                input: lastUserMsg.text ?? "",
+                                                regenerateFor: lastUserMsg
+                                            ) {
                                                 isGenerating = false
                                             }
                                         }
-                                    }) {
+                                    }
+                                    ) {
                                         HStack {
                                             Image(systemName: "arrow.clockwise")
                                             Text("Regenerate")
@@ -285,6 +292,9 @@ struct CoreAIView: View {
                     .frame(minHeight: 40, maxHeight: 120)
                     .background(Color.clear)
                     .foregroundColor(Color("TextColor"))
+                    .onChange(of: inputText) { newValue in
+                        handleTextChange(newValue)
+                    }
 
                 if inputText.isEmpty {
                     Text("Write your message ...")
@@ -324,15 +334,17 @@ struct CoreAIView: View {
         .animation(.easeInOut, value: selectedFile)
     }
     
-    private func sendMessage(feature: CoreAIFeature) {
+    private func sendMessage(feature: CoreAIFeature, regenerateFor userMessage: Message? = nil) {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty || selectedFile != nil else { return } // allow empty text for image/doc uploads
-        
+
         // Reset typing state
         inputText = ""
         isGenerating = true
-                
-        // MARK: - Route based on feature type
+        if convoManager.activeConversation == nil {
+            convoManager.activeConversation = convoManager.createConversation(title: text.isEmpty ? "New Chat" : text)
+        }
+
         switch feature {
         case .imageUnderstanding:
             guard let fileURL = selectedFile else {
@@ -341,8 +353,10 @@ struct CoreAIView: View {
                 return
             }
             convoManager.callImageUnderstandingAPI(
-                systemPrompt: systemPrompt, input: text,
-                fileURL: fileURL
+                systemPrompt: systemPrompt,
+                input: text,
+                fileURL: fileURL,
+                regenerateFor: userMessage
             ) {
                 isGenerating = false
                 resetMessageBox()
@@ -355,18 +369,20 @@ struct CoreAIView: View {
                 return
             }
             convoManager.callDocumentUnderstandingAPI(
-                systemPrompt: systemPrompt, input: text,
-                fileURL: fileURL
+                systemPrompt: systemPrompt,
+                input: text,
+                fileURL: fileURL,
+                regenerateFor: userMessage
             ) {
                 isGenerating = false
                 resetMessageBox()
             }
 
         default:
-            // Normal text-based flow
             convoManager.callFeatureAPI(
                 systemPrompt: systemPrompt,
-                input: text
+                input: text,
+                regenerateFor: nil
             ) {
                 isGenerating = false
                 resetMessageBox()
@@ -374,16 +390,22 @@ struct CoreAIView: View {
         }
     }
     
-//    private func recalcHeight() {
-//        let lineCount = max(1, inputText.split(separator: "\n").count)
-//        let newHeight = CGFloat(30 * lineCount + 100)
-//        editorHeight = min(max(145, newHeight), 400)
-//    }
-    
     private func resetMessageBox() {
         inputText = ""
         selectedFile = nil
         imagePreview = nil
+    }
+    
+    private func handleTextChange(_ newValue: String) {
+        guard newValue.hasSuffix("\n") else { return }
+
+        if isShiftPressed {
+            return  // allow newline
+        }
+        else {
+            inputText = newValue.trimmingCharacters(in: .newlines)
+            sendMessage(feature: selectedFeature ?? .summarization)
+        }
     }
     
     private func openFilePicker() {
