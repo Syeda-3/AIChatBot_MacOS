@@ -140,12 +140,8 @@ class ConversationManager: ObservableObject {
     
     // MARK: - Standard Chat (text + optional file)
 
-    func sendMessage(
-        inputText: String?,
-        fileURL: URL? = nil,
-        fileType: String? = nil,
-        regenerateFor userMessage: Message? = nil,
-        completion: (() -> Void)? = nil
+    func sendMessage(inputText: String, fileURL: URL? = nil, fileType: String? = nil,
+regenerateFor userMessage: Message? = nil, completion: (() -> Void)? = nil
     ) {
         guard let convo = activeConversation else {
             print("⚠️ No active conversation.")
@@ -160,16 +156,23 @@ class ConversationManager: ObservableObject {
 
         let url = "\(baseURL)/chat/completions"
 
-        var userMsg: Message?
-        if let text = inputText, userMessage == nil {
-            userMsg = addMessage(
-                to: convo,
-                text: text,
-                isUser: true,
-                fileURL: fileURL,
-                fileType: fileType
-            )
             
+        if userMessage == nil {
+            DispatchQueue.main.async {
+                self.addMessage(to: convo, text: inputText, isUser: true)
+                self.save()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    self.fetchAllConversations()
+                }
+            }
+        }
+
+        var allMessages = convo.messagesArray
+
+            if let userMessage = userMessage,
+               let index = allMessages.firstIndex(of: userMessage) {
+                allMessages = Array(allMessages[...index])
+            }
 
             if let fileURL = fileURL, let fileType = fileType {
                 switch fileType {
@@ -178,11 +181,11 @@ class ConversationManager: ObservableObject {
                        let tiff = image.tiffRepresentation,
                        let bitmap = NSBitmapImageRep(data: tiff),
                        let jpegData = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.6]) {
-                        userMsg?.fileData = jpegData
+                        userMessage?.fileData = jpegData
                     }
 
                 case "document":
-                    userMsg?.fileURL = fileURL.path
+                    userMessage?.fileURL = fileURL.path
 
                 default:
                     break
@@ -191,9 +194,8 @@ class ConversationManager: ObservableObject {
             }
 
             fetchAllConversations()
-        }
 
-        var allMessages = convo.messagesArray
+//        var allMessages = convo.messagesArray
 
         if let userMessage = userMessage {
             if let index = allMessages.firstIndex(of: userMessage) {
@@ -201,9 +203,9 @@ class ConversationManager: ObservableObject {
             }
         }
 
-        allMessages = allMessages.filter { msg in
-            !(msg.text?.contains("Message generation cancelled.") ?? false)
-        }
+//        allMessages = allMessages.filter { msg in
+//            !(msg.text?.contains("Message generation cancelled.") ?? false)
+//        }
 
 
         var messagesPayload: [[String: Any]] = allMessages.map { msg in
@@ -213,23 +215,14 @@ class ConversationManager: ObservableObject {
             ]
         }
 
-        var userContent: [[String: Any]] = [["type": "text", "text": inputText as Any]]
+        var userContent = inputText 
 
         if let fileURL = fileURL {
             switch fileType {
             case "image":
-                if let data = try? Data(contentsOf: fileURL) {
-                    let base64 = data.base64EncodedString()
-                    userContent.append([
-                        "type": "image_url",
-                        "image_url": ["url": "data:image/png;base64,\(base64)"]
-                    ])
-                }
+                userContent += "\n[Image attached: \(fileURL.lastPathComponent)]"
             case "document":
-                userContent.append([
-                    "type": "text",
-                    "text": "[Document attached: \(fileURL.lastPathComponent)]"
-                ])
+                userContent += "\n[Document attached: \(fileURL.lastPathComponent)]"
             default:
                 break
             }
@@ -261,39 +254,54 @@ class ConversationManager: ObservableObject {
         )
         .validate()
         .responseDecodable(of: OpenAIChatResponse.self) { response in
-            defer { DispatchQueue.main.async { completion?() } }
+                            
+                            defer { DispatchQueue.main.async { completion?() } }
 
-            switch response.result {
-            case .success(let result):
-                guard let reply = result.choices.first?.message.content else { return }
+                // 🔍 Always print debug info
+                if let data = response.data {
+                    print("📡 Raw:", String(data: data, encoding: .utf8) ?? "nil")
+                }
+                print("📄 Status:", response.response?.statusCode ?? 0)
+                print("⚠️ Error:", response.error?.localizedDescription ?? "none")
 
-                DispatchQueue.main.async {
-                    // 🔁 Handle regeneration replacement if needed
-                    if let userMessage = userMessage {
-                        if let oldAssistant = convo.messagesArray.first(where: { msg in
-                            msg.isUser == false &&
-                            (msg.timeStamp ?? .distantPast) > (userMessage.timeStamp ?? .distantPast)
-                        }) {
-                            oldAssistant.text = reply
-                            self.save()
-                            self.refreshActiveConversation()   // 👈 added line only
-                            return
+                switch response.result {
+                case .success(let result):
+                    guard let reply = result.choices.first?.message.content else {
+                        print("⚠️ No content in result:", result)
+                        return
+                    }
+
+                    DispatchQueue.main.async {
+                        if let userMessage = userMessage {
+                            // 🔁 Replace old assistant message
+                            if let oldAssistant = convo.messagesArray.first(where: { msg in
+                                !msg.isUser &&
+                                (msg.timeStamp ?? .distantPast) > (userMessage.timeStamp ?? .distantPast)
+                            }) {
+                                oldAssistant.text = reply
+                                self.save()
+                                self.refreshActiveConversation()
+                                return
+                            }
+                        }
+                        _ = self.addMessage(to: convo, text: reply, isUser: false)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            self.fetchAllConversations()
                         }
                     }
 
-                    self.fetchAllConversations()
-                }
-
-            case .failure(let error):
-                if !error.isExplicitlyCancelledError {
-                    if error.localizedDescription == "URLSessionTask failed with error: The request timed out." || error.localizedDescription == "URLSessionTask failed with error: The network connection was lost." {
-                        self.internetLoss()
+                case .failure:
+                    // fallback decode to inspect
+                    if let data = response.data,
+                       let json = try? JSONSerialization.jsonObject(with: data) {
+                        print("❌ Decode failed, JSON:", json)
+                    } else {
+                        print("❌ Alamofire error:", response.error?.localizedDescription ?? "unknown")
                     }
-                    print("❌ Alamofire error:", error.localizedDescription)
                 }
             }
+
         }
-    }
 
     private func refreshActiveConversation() {
         if let convoID = activeConversation?.objectID {
@@ -314,6 +322,7 @@ class ConversationManager: ObservableObject {
         if convo.messagesArray.contains(where: { $0.isUser == true }) {
             if let lastAssistant = convo.messagesArray.last(where: { $0.isUser == false }) {
                 lastAssistant.text = "Message generation cancelled."
+                messagesVersion += 1
             }
             else {
                 _ = addMessage(to: convo, text: "Message generation cancelled.", isUser: false)
@@ -387,6 +396,7 @@ class ConversationManager: ObservableObject {
         let text: String
     }
 }
+
 extension Conversation {
     var messagesArray: [Message] {
         let set = messages as? Set<Message> ?? []
@@ -416,8 +426,10 @@ extension ConversationManager {
         if userMessage == nil {
             DispatchQueue.main.async {
                 self.addMessage(to: convo, text: input, isUser: true)
-                self.save() // ✅ ensure persistence
-                self.fetchAllConversations()
+                self.save()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    self.fetchAllConversations()
+                }
             }
         }
 
@@ -471,9 +483,12 @@ extension ConversationManager {
                             return
                         }
                     }
-                    // 🆕 Otherwise add new AI message
+
                     _ = self.addMessage(to: convo, text: reply, isUser: false)
-                    self.fetchAllConversations()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        self.fetchAllConversations()
+                    }
+
                 }
 
             case .failure(let error):
@@ -516,7 +531,9 @@ extension ConversationManager {
                     userMsg.fileData = jpegData
                     self.save()
                 }
-                self.fetchAllConversations()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    self.fetchAllConversations()
+                }
             }
         }
 
@@ -574,7 +591,9 @@ extension ConversationManager {
                         }
                     }
                     _ = self.addMessage(to: convo, text: reply, isUser: false)
-                    self.fetchAllConversations()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        self.fetchAllConversations()
+                    }
                 }
 
             case .failure(let error):
@@ -609,7 +628,9 @@ extension ConversationManager {
         if userMessage == nil {
             DispatchQueue.main.async {
                 self.addMessage(to: convo, text: input, isUser: true, fileURL: fileURL, fileType: "document")
-                self.fetchAllConversations()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    self.fetchAllConversations()
+                }
             }
         }
 
@@ -669,7 +690,9 @@ extension ConversationManager {
                         }
                     }
                     _ = self.addMessage(to: convo, text: reply, isUser: false)
-                    self.fetchAllConversations()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        self.fetchAllConversations()
+                    }
                 }
 
             case .failure(let error):

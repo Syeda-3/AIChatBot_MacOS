@@ -144,7 +144,7 @@ struct ChatWithAIView: View {
                         }
                         
                         // Messages area
-                        VStack(spacing: 10) {
+                        VStack {
                             ScrollViewReader { proxy in
                                 ScrollView {
                                     VStack(alignment: .leading, spacing: 12) {
@@ -165,9 +165,7 @@ struct ChatWithAIView: View {
                                     scrollToBottom(proxy)
                                 }
                             }
-
-                                                    
-                            // Buttons row
+                            Divider()
                             HStack(spacing: 12) {
                                 if isGenerating {
                                     VStack(spacing: 6) {
@@ -199,7 +197,7 @@ struct ChatWithAIView: View {
                                         
                                         isGenerating = true
                                         convoManager.sendMessage(
-                                            inputText: lastUserMsg.text,
+                                            inputText: lastUserMsg.text ?? "",
                                             regenerateFor: lastUserMsg
                                         ) {
                                             DispatchQueue.main.async {
@@ -213,7 +211,7 @@ struct ChatWithAIView: View {
                                             Text("Regenerate")
                                         }
                                         .padding(.horizontal, 16)
-                                        .padding(.vertical, 6)
+                                        .padding(.vertical, 10)
                                         .foregroundColor(.green)
                                         .background(Color("mainBG"))
                                         .cornerRadius(8)
@@ -221,7 +219,7 @@ struct ChatWithAIView: View {
                                     .buttonStyle(.plain)
                                 }
                             }
-                            .padding(.vertical, 4)
+                             .padding(.vertical, 4)
                             
                             // Message box
                             messageBox
@@ -241,11 +239,12 @@ struct ChatWithAIView: View {
             }
             SubscriptionManager.shared.clearCachedPlan()
             UserDefaults.standard.removePersistentDomain(forName: "AI.chatbot.Mac.App.AI")
-
+            
         }
         .sheet(isPresented: $convoManager.showSubscription) {
             SubscriptionView()
         }
+
     }
 
     // MARK: - Message Box
