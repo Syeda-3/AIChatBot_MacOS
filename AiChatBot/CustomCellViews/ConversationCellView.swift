@@ -46,7 +46,6 @@ struct ConversationCellView: View {
                     .padding(.leading, 12)
                     .padding(.vertical, 8)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .onTapGesture { onSelect() }
             }
             
             Menu {
@@ -64,5 +63,8 @@ struct ConversationCellView: View {
             (isSelected ? Color.black : Color("BgColor"))
                 .cornerRadius(8)
         )
+        .onTapGesture {
+            onSelect()
+        }
     }
 }

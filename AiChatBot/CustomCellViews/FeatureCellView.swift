@@ -21,13 +21,13 @@ struct FeatureCellView: View {
                     .padding(.leading, 12)
                     .padding(.vertical, 8)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .onTapGesture {
-                        onSelect()
-                    }
             }
         .background(
             (isSelected ? Color.black : Color("BgColor"))
                 .cornerRadius(8)
         )
+        .onTapGesture {
+            onSelect()
+        }
     }
 }

@@ -22,6 +22,14 @@ struct AiChatBotApp: App {
             MainContainer()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(ConversationManager(context: persistenceController.container.viewContext))
+                       .onAppear {
+                           // Make window full screen on launch
+                           if let window = NSApplication.shared.windows.first {
+                               window.setFrame(NSScreen.main?.visibleFrame ?? .zero, display: true)
+                           }
+                       }
         }
+       
+        
     }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 import UniformTypeIdentifiers
 import AppKit
+import StoreKit
 
 struct CoreAIView: View {
     
@@ -69,7 +70,7 @@ struct CoreAIView: View {
                             HStack {
                                 Spacer()
                                 subFeatureMenu
-                                    .frame(width: 230)
+                                    .frame(width: 180)
                                     .padding(.trailing, 16)
                                     .padding(.vertical,4)
                             }

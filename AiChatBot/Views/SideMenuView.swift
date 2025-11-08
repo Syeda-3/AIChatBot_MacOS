@@ -18,7 +18,9 @@ struct SideMenu: View {
     @Binding var selected: MenuItem?
     @State private var showSubscription: Bool = false
     @Environment(\.openURL) private var openURL
-
+    @ObservedObject var store = SubscriptionManager.shared
+    
+    
     var body: some View {
         
         VStack(alignment: .leading, spacing: 12) {
@@ -38,23 +40,30 @@ struct SideMenu: View {
             
             Spacer()
             
-            Button(action: {
-                // subscriptiiion
-                showSubscription = true
-            }) {
-                Label("Upgrade Pro", systemImage: "bolt.fill")
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .foregroundColor(.white)
-                    .background(Color("PrimaryColor"))
-                    .cornerRadius(20)
+            if store.hasActivePlan == false {
+                Button(action: {
+                    // subscriptiiion
+                    showSubscription = true
+                }) {
+                    Label("Upgrade Pro", systemImage: "bolt.fill")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .foregroundColor(.white)
+                        .background(Color("PrimaryColor"))
+                        .cornerRadius(20)
+                    
+                }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                
             }
-            .buttonStyle(.plain)
             
             VStack(alignment: .leading, spacing: 10) {
                 // Support
                 Button {
-                    print("Support tapped")
+                    if let url = URL(string: "https://fli.so/AIchatbot-support") {
+                        openURL(url)
+                    }
                 } label: {
                     HStack {
                         Image("support")
@@ -64,7 +73,7 @@ struct SideMenu: View {
                     }
                 }
                 .buttonStyle(.plain)
-
+                
                 // Terms & Conditions
                 Button {
                     if let url = URL(string: "https://fli.so/terms-and-conditions") {
@@ -79,7 +88,8 @@ struct SideMenu: View {
                     }
                 }
                 .buttonStyle(.plain)
-
+                .contentShape(Rectangle())
+                
                 // Privacy
                 Button {
                     if let url = URL(string: "https://fli.so/privacy-policy") {
@@ -94,8 +104,10 @@ struct SideMenu: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                
             }
-
+            
         }
         .padding()
         .frame(minWidth: 200, maxWidth: 220, alignment: .topLeading)
@@ -110,18 +122,17 @@ struct SideMenu: View {
             selected = item
         }) {
             Label(title, image: systemImage)
-                .foregroundColor(selected == item ? Color.white :  Color("TextColor"))
+                .foregroundColor(selected == item ? Color.white : Color("TextColor"))
                 .padding(.vertical, 6)
                 .padding(.horizontal, 6)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(selected == item ? Color.black : Color.clear)
                 .cornerRadius(8)
+                .contentShape(Rectangle()) // ✅ makes full area clickable
         }
         .buttonStyle(.plain)
     }
 }
-
-
 
 //            if showWaveform {
 //                // 🎤 Recording state

@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A6054A4B2EB9B57400255E6F /* RegionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6054A4A2EB9B56400255E6F /* RegionViewModel.swift */; };
 		A61569002E9A92E30022E09E /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A61568FF2E9A92E30022E09E /* Secrets.xcconfig */; };
+		A623DD182EBE71D20086255C /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A623DD172EBE71D20086255C /* ToastManager.swift */; };
 		A6243A562E9AAB75009AA0C2 /* ModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6243A552E9AAB6E009AA0C2 /* ModelView.swift */; };
 		A62516B02EA1B408001070D6 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62516AF2EA1B408001070D6 /* StoreKit.framework */; };
 		A62516B32EA1B849001070D6 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62516B22EA1B844001070D6 /* SubscriptionManager.swift */; };
@@ -40,7 +42,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A6054A4A2EB9B56400255E6F /* RegionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionViewModel.swift; sourceTree = "<group>"; };
 		A61568FF2E9A92E30022E09E /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		A623DD172EBE71D20086255C /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
 		A6243A552E9AAB6E009AA0C2 /* ModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelView.swift; sourceTree = "<group>"; };
 		A62516AF2EA1B408001070D6 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		A62516B22EA1B844001070D6 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
@@ -128,11 +132,13 @@
 		A67C4FC92E90000200100FB6 /* Helper Managers */ = {
 			isa = PBXGroup;
 			children = (
+				A6054A4A2EB9B56400255E6F /* RegionViewModel.swift */,
 				A62516B22EA1B844001070D6 /* SubscriptionManager.swift */,
 				A67C4FD32E90000200100FB6 /* AudioWaveManager.swift */,
 				A67C4FCA2E90000200100FB6 /* ConversationManager.swift */,
 				A62B575F2E9BC2F700711DC7 /* CoreAiFeatureManager.swift */,
 				A67C4FC82E90000200100FB6 /* FontsManager.swift */,
+				A623DD172EBE71D20086255C /* ToastManager.swift */,
 				A67C4FCC2E90000200100FB6 /* PersistenceController.swift */,
 				A6AE5BCA2E905D55005DEBA5 /* FeatureManager.swift */,
 			);
@@ -265,6 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6054A4B2EB9B57400255E6F /* RegionViewModel.swift in Sources */,
 				A67C4FD82E90000200100FB6 /* FontsManager.swift in Sources */,
 				A67C4FD92E90000200100FB6 /* ConversationManager.swift in Sources */,
 				A6AE5BCB2E905D5D005DEBA5 /* FeatureManager.swift in Sources */,
@@ -282,6 +289,7 @@
 				A67C4FDD2E90000200100FB6 /* SideMenuView.swift in Sources */,
 				A6A8912B2E9043A200A6725A /* MainContainer.swift in Sources */,
 				A67C4FDE2E90000200100FB6 /* AiChatBotApp.swift in Sources */,
+				A623DD182EBE71D20086255C /* ToastManager.swift in Sources */,
 				A6243A562E9AAB75009AA0C2 /* ModelView.swift in Sources */,
 				A67C4FDF2E90000200100FB6 /* AudioWaveManager.swift in Sources */,
 			);
@@ -420,12 +428,11 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = AiChatBot.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = 49GNV8FGZ6;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -443,6 +450,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AiChatBot/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs microphone for recording audio.";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -453,7 +461,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = AI.chatbot.Mac.App.AI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = devProvProfile;
 				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
@@ -478,12 +485,11 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = AiChatBot.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = 49GNV8FGZ6;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -501,6 +507,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AiChatBot/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App needs microphone for recording audio.";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -511,7 +518,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = AI.chatbot.Mac.App.AI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = devProvProfile;
 				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;

@@ -239,6 +239,9 @@ struct ChatWithAIView: View {
             if convoManager.activeConversation == nil {
                 convoManager.activeConversation = conversations.last
             }
+            SubscriptionManager.shared.clearCachedPlan()
+            UserDefaults.standard.removePersistentDomain(forName: "AI.chatbot.Mac.App.AI")
+
         }
         .sheet(isPresented: $convoManager.showSubscription) {
             SubscriptionView()

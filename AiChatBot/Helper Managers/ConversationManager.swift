@@ -43,7 +43,7 @@ class ConversationManager: ObservableObject {
     
     private func canSendMessage() -> Bool {
         if hasActiveSubscription() { return true }
-        return totalUserMessagesCount() < 5
+        return totalUserMessagesCount() < 100
     }
     
     private func handleSubscriptionLimit() -> Bool {
@@ -111,7 +111,7 @@ class ConversationManager: ObservableObject {
     }
     
     // MARK: - Message Save
-//    @discardableResult
+    @discardableResult
     func addMessage(to convo: Conversation,
                     text: String? = nil,
                     isUser: Bool,
@@ -160,7 +160,6 @@ class ConversationManager: ObservableObject {
 
         let url = "\(baseURL)/chat/completions"
 
-        // 🧩 Step 1 — Immediately show the user message
         var userMsg: Message?
         if let text = inputText, userMessage == nil {
             userMsg = addMessage(
@@ -171,7 +170,7 @@ class ConversationManager: ObservableObject {
                 fileType: fileType
             )
             
-            // handle attachments early if needed
+
             if let fileURL = fileURL, let fileType = fileType {
                 switch fileType {
                 case "image":
@@ -191,26 +190,22 @@ class ConversationManager: ObservableObject {
                 save()
             }
 
-            // refresh UI immediately
             fetchAllConversations()
         }
 
         var allMessages = convo.messagesArray
 
-        // 🧹 Trim messages after the user message when regenerating
         if let userMessage = userMessage {
             if let index = allMessages.firstIndex(of: userMessage) {
                 allMessages = Array(allMessages[...index])
             }
         }
 
-        // 🧹 Exclude "cancelled" assistant messages from payload
         allMessages = allMessages.filter { msg in
             !(msg.text?.contains("Message generation cancelled.") ?? false)
         }
 
 
-        // 🧩 Step 2 — Build API payload
         var messagesPayload: [[String: Any]] = allMessages.map { msg in
             [
                 "role": msg.isUser ? "user" : "assistant",
@@ -239,7 +234,7 @@ class ConversationManager: ObservableObject {
                 break
             }
         }
-
+        
         messagesPayload.append([
             "role": "user",
             "content": userContent
@@ -255,7 +250,6 @@ class ConversationManager: ObservableObject {
             "Content-Type": "application/json"
         ]
 
-        // 🧩 Step 3 — Cancel any running request and make a new one
         currentRequest?.cancel()
 
         currentRequest = AF.request(
@@ -287,13 +281,14 @@ class ConversationManager: ObservableObject {
                         }
                     }
 
-                    // 🧩 Step 4 — Append assistant reply
-    //                _ = self.addMessage(to: convo, text: reply, isUser: false)
                     self.fetchAllConversations()
                 }
 
             case .failure(let error):
                 if !error.isExplicitlyCancelledError {
+                    if error.localizedDescription == "URLSessionTask failed with error: The request timed out." || error.localizedDescription == "URLSessionTask failed with error: The network connection was lost." {
+                        self.internetLoss()
+                    }
                     print("❌ Alamofire error:", error.localizedDescription)
                 }
             }
@@ -313,12 +308,38 @@ class ConversationManager: ObservableObject {
     func cancelGeneration() {
         currentRequest?.cancel()
         currentRequest = nil
-
+        
         guard let convo = activeConversation else { return }
 
-        // Add visible message for user
-        _ = addMessage(to: convo, text: "Message generation cancelled.", isUser: false)
-        self.fetchAllConversations()
+        if convo.messagesArray.contains(where: { $0.isUser == true }) {
+            if let lastAssistant = convo.messagesArray.last(where: { $0.isUser == false }) {
+                lastAssistant.text = "Message generation cancelled."
+            }
+            else {
+                _ = addMessage(to: convo, text: "Message generation cancelled.", isUser: false)
+            }
+        }
+        
+        fetchAllConversations()
+    }
+
+    
+    func internetLoss() {
+        currentRequest?.cancel()
+        currentRequest = nil
+        
+        guard let convo = activeConversation else { return }
+
+        if convo.messagesArray.contains(where: { $0.isUser == true }) {
+            if let lastAssistant = convo.messagesArray.last(where: { $0.isUser == false }) {
+                lastAssistant.text = "Network connection lost. Attempting to reconnect…."
+            }
+            else {
+                _ = addMessage(to: convo, text: "Network connection lost. Attempting to reconnect.", isUser: false)
+            }
+        }
+        
+        fetchAllConversations()
     }
 
     // MARK: - Save Helper
@@ -392,7 +413,6 @@ extension ConversationManager {
             return
         }
 
-        // 🟢 Show user message immediately only if not regenerating
         if userMessage == nil {
             DispatchQueue.main.async {
                 self.addMessage(to: convo, text: input, isUser: true)
@@ -401,32 +421,22 @@ extension ConversationManager {
             }
         }
 
-        // 🧹 Trim messages after the regeneration point
         var allMessages = convo.messagesArray
         if let userMessage = userMessage,
            let index = allMessages.firstIndex(of: userMessage) {
             allMessages = Array(allMessages[...index])
         }
 
-        // 🧩 Build payload
-        var messagesPayload: [[String: Any]] = allMessages.map { msg in
-            [
-                "role": msg.isUser ? "user" : "assistant",
-                "content": msg.text ?? ""
-            ]
-        }
-
-        // Append latest user input
-        messagesPayload.append([
-            "role": "user",
-            "content": input
-        ])
         
         let url = "\(baseURL)/chat/completions"
         let parameters: [String: Any] = [
             "model": "gpt-5-mini",
-            "messages": messagesPayload
+            "messages": [
+                ["role": "system", "content": systemPrompt],
+                ["role": "user", "content": input]
+            ]
         ]
+        
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(apiKey)",
             "Content-Type": "application/json"
@@ -468,6 +478,9 @@ extension ConversationManager {
 
             case .failure(let error):
                 if !error.isExplicitlyCancelledError {
+                    if error.localizedDescription == "URLSessionTask failed with error: The request timed out." || error.localizedDescription == "URLSessionTask failed with error: The network connection was lost." {
+                        self.internetLoss()
+                    }
                     print("❌ Feature API error:", error.localizedDescription)
                 }
             }
@@ -515,25 +528,18 @@ extension ConversationManager {
         }
 
         let base64 = (try? Data(contentsOf: fileURL))?.base64EncodedString() ?? ""
-        var messagesPayload: [[String: Any]] = allMessages.map { msg in
-            [
-                "role": msg.isUser ? "user" : "assistant",
-                "content": msg.text ?? ""
-            ]
-        }
-
-        messagesPayload.append([
-            "role": "user",
-            "content": [
-                ["type": "text", "text": input],
-                ["type": "image_url", "image_url": ["url": "data:image/png;base64,\(base64)"]]
-            ]
-        ])
-
+       
         let parameters: [String: Any] = [
-            "model": "gpt-5-mini",
-            "messages": messagesPayload
-        ]
+                    "model": "gpt-5-mini",
+                    "messages": [
+                        ["role": "system", "content": systemPrompt],
+                        ["role": "user", "content": [
+                            ["type": "text", "text": input],
+                            ["type": "image_url", "image_url": ["url": "data:image/png;base64,\(base64)"]]
+                        ]]
+                    ]
+                    ]
+                    
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(apiKey)",
             "Content-Type": "application/json"
@@ -573,6 +579,9 @@ extension ConversationManager {
 
             case .failure(let error):
                 if !error.isExplicitlyCancelledError {
+                    if error.localizedDescription == "URLSessionTask failed with error: The request timed out." || error.localizedDescription == "URLSessionTask failed with error: The network connection was lost." {
+                        self.internetLoss()
+                    }
                     print("❌ Image Understanding API error:", error.localizedDescription)
                 }
             }
@@ -612,8 +621,8 @@ extension ConversationManager {
 
         var messagesPayload: [[String: Any]] = allMessages.map { msg in
             [
-                "role": msg.isUser ? "user" : "assistant",
-                "content": msg.text ?? ""
+                "role": "system",
+                "content": systemPrompt
             ]
         }
 
@@ -665,6 +674,9 @@ extension ConversationManager {
 
             case .failure(let error):
                 if !error.isExplicitlyCancelledError {
+                    if error.localizedDescription == "URLSessionTask failed with error: The request timed out." || error.localizedDescription == "URLSessionTask failed with error: The network connection was lost." {
+                        self.internetLoss()
+                    }
                     print("❌ Document Understanding API error:", error.localizedDescription)
                 }
             }
