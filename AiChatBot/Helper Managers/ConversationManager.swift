@@ -194,19 +194,13 @@ regenerateFor userMessage: Message? = nil, completion: (() -> Void)? = nil
             }
 
             fetchAllConversations()
-
-//        var allMessages = convo.messagesArray
+        
 
         if let userMessage = userMessage {
             if let index = allMessages.firstIndex(of: userMessage) {
                 allMessages = Array(allMessages[...index])
             }
         }
-
-//        allMessages = allMessages.filter { msg in
-//            !(msg.text?.contains("Message generation cancelled.") ?? false)
-//        }
-
 
         var messagesPayload: [[String: Any]] = allMessages.map { msg in
             [
@@ -255,8 +249,7 @@ regenerateFor userMessage: Message? = nil, completion: (() -> Void)? = nil
         .validate()
         .responseDecodable(of: OpenAIChatResponse.self) { response in
                             
-                            defer { DispatchQueue.main.async { completion?() } }
-
+        defer { DispatchQueue.main.async { completion?() } }
                 // 🔍 Always print debug info
                 if let data = response.data {
                     print("📡 Raw:", String(data: data, encoding: .utf8) ?? "nil")
@@ -283,6 +276,7 @@ regenerateFor userMessage: Message? = nil, completion: (() -> Void)? = nil
                                 self.refreshActiveConversation()
                                 return
                             }
+                        
                         }
                         _ = self.addMessage(to: convo, text: reply, isUser: false)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {

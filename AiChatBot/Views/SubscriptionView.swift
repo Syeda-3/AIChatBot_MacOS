@@ -145,6 +145,13 @@ struct SubscriptionView: View {
             }
         }
         .padding(.horizontal)
+        .onChange(of: store.currentPlan) { newValue in
+            if let productID = newValue?.id {
+                selectedPlan = Plan.allCases.first { $0.productID == productID }
+            } else {
+                selectedPlan = nil
+            }
+        }
     }
 
     // MARK: - CTA
@@ -154,9 +161,7 @@ struct SubscriptionView: View {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 16))
                     .foregroundColor(.white)
-                
-        
-                Text( selectedPlan == .monthly ? "Avail 3 days free trial." : "Secured by Apple, Cancel anytime.")
+                Text("Secured by Apple, Cancel anytime.")
                     .foregroundColor(.white)
                     .font(.system(size: 12, weight: .medium))
             }
@@ -174,7 +179,7 @@ struct SubscriptionView: View {
                     }
                 }
             } label: {
-                Text(buttonTitle)
+                Text( selectedPlan == .monthly ? "Avail 3 days free trial" : buttonTitle)
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -204,7 +209,6 @@ struct SubscriptionView: View {
                     .buttonStyle(.plain)
                 Button("Restore") {
                     Task {
-//                        try? await AppStore.sync()
                         await store.updatePurchasedProducts()
                     }
                 }

@@ -50,9 +50,7 @@ struct ConversationCellView: View {
             
             Menu {
                 Button("Rename") { onRenameStart(convo) }
-                Button(role: .destructive) { onDelete() } label: {
-                    Label("Delete", systemImage: "trash")
-                }
+                Button("Delete" ,role: .destructive) { onDelete() } 
             } label: {
             }
             .frame(width: 15)
