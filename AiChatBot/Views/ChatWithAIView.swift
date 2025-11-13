@@ -21,7 +21,6 @@ struct ChatWithAIView: View {
     @State private var tempTitle: String = ""
     @StateObject private var recorder = AudioRecorder()
     @State private var showWaveform = false
-    @State private var showSubscription: Bool = false
     @State private var lastShiftPressed = false
 
     @FetchRequest(
@@ -40,7 +39,8 @@ struct ChatWithAIView: View {
     @State private var selectedFileType: String? = nil
     @State private var isShiftPressed = false
     @FocusState private var focusEditor: Bool
-
+    @ObservedObject var store = SubscriptionManager.shared
+    
     var body: some View {
         ZStack {
             Color("mainBG").ignoresSafeArea()
@@ -237,12 +237,9 @@ struct ChatWithAIView: View {
             if convoManager.activeConversation == nil {
                 convoManager.activeConversation = conversations.last
             }
-            SubscriptionManager.shared.clearCachedPlan()
-            UserDefaults.standard.removePersistentDomain(forName: "AI.chatbot.Mac.App.AI")
-            
         }
-        .sheet(isPresented: $convoManager.showSubscription) {
-            SubscriptionView()
+        .sheet(isPresented: $store.showSubscription) {
+            SubscriptionView(showSubscription: $store.showSubscription)
         }
 
     }

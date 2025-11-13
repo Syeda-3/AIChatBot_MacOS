@@ -25,10 +25,10 @@ struct CoreAIView: View {
     @State private var selectedFile: URL?
     @State private var imagePreview: NSImage?
     @State private var systemPrompt: String = ""
-    @State private var showSubscription: Bool = false
     @State private var isShiftPressed = false
     @FocusState private var focusEditor: Bool
-
+    @ObservedObject var store = SubscriptionManager.shared
+    
     var body: some View {
         ZStack {
 
@@ -202,10 +202,9 @@ struct CoreAIView: View {
         .onChange(of: selectedSubFeature) {
             _ in updateSystemPrompt()
         }
-        .sheet(isPresented: $convoManager.showSubscription) {
-            SubscriptionView()
+        .sheet(isPresented: $store.showSubscription) {
+            SubscriptionView(showSubscription: $store.showSubscription)
         }
-
     }
     
     private var subFeatureMenu: some View {

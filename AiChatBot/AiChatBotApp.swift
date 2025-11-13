@@ -12,7 +12,6 @@ import CoreData
 struct AiChatBotApp: App {
     let persistenceController = PersistenceController.shared
 
-    // 👇 Persistent instance — created once for the lifetime of the app
     @StateObject private var convoManager = ConversationManager(
         context: PersistenceController.shared.container.viewContext
     )
@@ -21,15 +20,19 @@ struct AiChatBotApp: App {
         WindowGroup {
             MainContainer()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environmentObject(ConversationManager(context: persistenceController.container.viewContext))
-                       .onAppear {
-                           // Make window full screen on launch
-                           if let window = NSApplication.shared.windows.first {
-                               window.setFrame(NSScreen.main?.visibleFrame ?? .zero, display: true)
-                           }
-                       }
+                .environmentObject(convoManager)
+                .onAppear {
+                    if let window = NSApplication.shared.windows.first {
+                        window.setFrame(NSScreen.main?.visibleFrame ?? .zero, display: true)
+                    }
+                }
+                .task {
+                    let subManager = SubscriptionManager.shared
+                    await subManager.detectRegion()
+                    subManager.loadCachedPlan()
+                    await subManager.loadProducts()
+                    await subManager.updatePurchasedProducts()
+                }
         }
-       
-        
     }
 }

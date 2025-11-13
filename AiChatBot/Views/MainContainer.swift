@@ -9,7 +9,8 @@ import SwiftUI
 
 struct MainContainer: View {
     @State private var selected: MenuItem? = .chatWithAI
-    
+    @State private var showSubscription = false
+
     var body: some View {
         HStack(spacing: 0) {
             SideMenu(selected: $selected)

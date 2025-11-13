@@ -16,7 +16,6 @@ enum MenuItem: String {
 struct SideMenu: View {
     
     @Binding var selected: MenuItem?
-    @State private var showSubscription: Bool = false
     @Environment(\.openURL) private var openURL
     @ObservedObject var store = SubscriptionManager.shared
     
@@ -42,8 +41,7 @@ struct SideMenu: View {
             
             if store.hasActivePlan == false {
                 Button(action: {
-                    // subscriptiiion
-                    showSubscription = true
+                    store.showSubscription = true
                 }) {
                     Label("Upgrade Pro", systemImage: "bolt.fill")
                         .frame(maxWidth: .infinity)
@@ -55,9 +53,8 @@ struct SideMenu: View {
                 }
                 .buttonStyle(.plain)
                 .contentShape(Rectangle())
-                
             }
-            
+
             VStack(alignment: .leading, spacing: 10) {
                 // Support
                 Button {
@@ -112,8 +109,8 @@ struct SideMenu: View {
         .padding()
         .frame(minWidth: 200, maxWidth: 220, alignment: .topLeading)
         .background(Color("BgColor"))
-        .sheet(isPresented: $showSubscription) {
-            SubscriptionView()
+        .sheet(isPresented: $store.showSubscription) {
+            SubscriptionView(showSubscription: $store.showSubscription)
         }
     }
     

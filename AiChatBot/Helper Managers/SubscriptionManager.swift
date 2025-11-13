@@ -20,7 +20,8 @@ final class SubscriptionManager: ObservableObject {
     
     @Published var userRegion: String = "Unknown"
     @Published var userCurrency: String = "Unknown"
-    
+    @Published var showSubscription: Bool = false
+
     var hasActivePlan = false
 
     let productIDs = ["AI.Chatbot.weekly.subscription.mac.app",
@@ -66,6 +67,7 @@ final class SubscriptionManager: ObservableObject {
             for product in subscriptions {
                 print("→ \(product.displayName): \(product.displayPrice)")
             }
+            self.loadCachedPlan()
         } catch {
             print("❌ Failed to load products:", error)
         }
@@ -116,6 +118,7 @@ final class SubscriptionManager: ObservableObject {
         if let active = purchased.first {
             currentPlan = active
             hasActivePlan = true
+            showSubscription = false
             print("✅ Active subscription:", active.displayName)
         }
         else {
@@ -123,7 +126,6 @@ final class SubscriptionManager: ObservableObject {
             print("🚫 No active subscriptions found.")
             clearCachedPlan()
         }
-        
         saveCurrentPlan()
     }
     
@@ -154,6 +156,7 @@ final class SubscriptionManager: ObservableObject {
               let product = subscriptions.first(where: { $0.id == cachedID }) else { return }
         currentPlan = product
         hasActivePlan = true
+        
     }
     
     func clearCachedPlan() {

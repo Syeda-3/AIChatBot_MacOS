@@ -19,7 +19,7 @@ class ConversationManager: ObservableObject {
 
     @Published var conversations: [Conversation] = []
     @Published var activeConversation: Conversation?
-    @Published var showSubscription: Bool = false
+
     private var currentRequest: DataRequest?
     
     let apiKey = Bundle.main.infoDictionary?["API_KEY"] ?? ""
@@ -43,13 +43,13 @@ class ConversationManager: ObservableObject {
     
     private func canSendMessage() -> Bool {
         if hasActiveSubscription() { return true }
-        return totalUserMessagesCount() < 100
+        return totalUserMessagesCount() < 3
     }
     
     private func handleSubscriptionLimit() -> Bool {
         if !canSendMessage() {
             DispatchQueue.main.async {
-                self.showSubscription = true
+                SubscriptionManager.shared.showSubscription = true
             }
             return false
         }

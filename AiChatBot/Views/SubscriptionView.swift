@@ -32,13 +32,13 @@ struct SubscriptionView: View {
         }
     }
     
-    init() {
-        if let savedID = UserDefaults.standard.string(forKey: "activePlanID"),
-           let plan = Plan.allCases.first(where: { $0.productID == savedID }) {
-            _selectedPlan = State(initialValue: plan)
-        }
-    }
-
+    init(showSubscription: Binding<Bool>) {
+           if let savedID = UserDefaults.standard.string(forKey: "activePlanID"),
+              let plan = Plan.allCases.first(where: { $0.productID == savedID }) {
+               _selectedPlan = State(initialValue: plan)
+           }
+       }
+    
     var body: some View {
         ZStack(alignment: .topTrailing) {
 
